@@ -17,8 +17,13 @@ const createProject = async (req,res) =>{
 
 // get all projects of a user
 const getProjects = async (req, res) => {
-  const projects = await Project.find({});
-  res.json(projects);
+  try {
+    const userId = req.user.id; // Extract the user ID from the request
+    const projects = await Project.find({ userId });
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 };
 
 // get a single project by id
