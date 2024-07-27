@@ -7,7 +7,7 @@ const TaskSchema = new mongoose.Schema(
       ref: "Project",
       required: true,
     },
-    taskName: { type: String, required: true },
+    taskTitle: { type: String, required: true },
     taskDescription: { type: String , required : true},
     taskStatus: {
       type: String,
