@@ -9,6 +9,7 @@ const TaskSchema = new mongoose.Schema(
     },
     taskTitle: { type: String, required: true },
     taskDescription: { type: String , required : true},
+    taskEndDate: { type: Date, required: true },
     taskStatus: {
       type: String,
       enum: ["completed", "not completed"],

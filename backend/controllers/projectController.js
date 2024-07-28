@@ -2,14 +2,14 @@ const Project = require('../models/projectModels');
 require('dotenv').config();
 const validateToken = require('../middlewares/validateTokenHandler');
 
-// create a new project
+// create a new project  
 const createProject = async (req,res) =>{
     const {projectNumber,projectTitle} = req.body;
     const userId = req.user.id; // Extract the user ID from the JWT payload
 
     if(!projectNumber ||!projectTitle){
         return res.status(400).json({message: 'All fields are required'});
-    }
+    } 
     const project = new Project({projectNumber, projectTitle, userId});
     await project.save();
     res.status(201).json(project);
@@ -27,7 +27,7 @@ const getProjects = async (req, res) => {
 };
 
 // get a single project by id
-const getProject = async (req,res) => {
+const getProject = async (req,res) => {  
     try {
         const project = await Project.findById(req.params.id);
         if (!project) {
@@ -66,10 +66,13 @@ const deleteProject = async (req,res) => {
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
-    res.status(200).json({ project: project, message: 'Project deleted successfully' });
+      // Delete all tasks associated with the project
+      await Task.deleteMany({ projectId: req.params.id });
+
+     res.status(200).json({ project: project, message: 'Project and associated tasks deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
-  }
+  } 
 };
 
 module.exports = { createProject, getProjects, getProject, updateProject, deleteProject };
