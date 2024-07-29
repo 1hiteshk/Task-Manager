@@ -24,7 +24,7 @@ interface Task {
 }
 
 const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
-    console.log(selectedDate)
+   // console.log(selectedDate)
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -37,9 +37,9 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
     
   try {
     const res = await api.get(`/projects/${projectId}/tasks`);
-    console.log(res.data,"task lists data")
+    console.log({value : res.data})
     setTasks(res.data);
-    setFilteredTasks(res.data);
+    /* setFilteredTasks(res.data); */
   } catch (error) {
     console.error('Error fetching tasks:', error);
   }
@@ -48,7 +48,7 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
 
   useEffect(() => {
     fetchTasks();
-  }, [projectId, refreshTasks]);
+  }, [projectId,refreshTasks]);
 
   useEffect(() => {
     filterTasks();
@@ -58,12 +58,13 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
     let filtered = tasks.filter(task => {
       const taskStartDate = new Date(task?.createdAt || '');
       const taskEndDate = new Date(task?.taskEndDate || '');
-      console.log(taskStartDate,selectedDate,taskEndDate)
+      console.log({taskStartDate,selectedDate,taskEndDate})
       return selectedDate && ((selectedDate >= taskStartDate && selectedDate <= taskEndDate) || selectedDate <= taskEndDate);
     });
     if (filter !== 'all') {
       filtered = filtered.filter(task => task.taskStatus === filter);
     }
+    console.log({filtered})
     setFilteredTasks(filtered);
   };
 
@@ -93,7 +94,7 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
     }
   };
 
-  console.log(tasks,"tasks")
+  console.log({filteredTasks})
   if(tasks.length==0) return(
     <Heading display={'flex'} justifyContent={'center'} alignItems={'center'} as={'h3'} >No tasks for this project</Heading>
   )

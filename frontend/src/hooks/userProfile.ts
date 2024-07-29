@@ -1,22 +1,18 @@
-import useCookie from "./cookie/useCookie"
-import { useDispatch } from "react-redux";
-const userProfile = ()=> {
-    const {getCookie} = useCookie();
-    const dispatch = useDispatch();
-    const token = getCookie('token');
+import useCookie from './cookie/useCookie';
 
-    if (!token) {
-        console.error("Token is not available");
-        return null;
-      }
+const userProfile = async () => {
+  const { getCookie } = useCookie();
+  const token = getCookie('token');
 
-    let parts = token.split(".");
-    let payload = JSON.parse(atob(parts[1]));
+  if (!token) {
+    console.error('Token is not available');
+    return null;
+  }
 
-    console.log(payload,"payload")
+  const parts = token.split('.');
+  const payload = JSON.parse(atob(parts[1]));
 
-    return payload.user;
-
-}
+  return payload.user;
+};
 
 export default userProfile;
