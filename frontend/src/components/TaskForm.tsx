@@ -2,25 +2,33 @@
 import React, { useState, useEffect } from 'react';
 import { Button, FormControl, FormLabel, Input, Textarea, Select } from '@chakra-ui/react';
 import api from '../utils/api';
+import { addTask, fetchTasks, updateTask } from '@/redux/tasks/tasksSlice';
+import { AppDispatch } from '@/app/store';
+import { useDispatch } from 'react-redux';
 
 export interface TaskFormProps {
   projectId: string;
-  taskId?: string;
+  _id?: string;
+  selectedTask:any;
   initialData?: {
     taskTitle: string;
     taskDescription: string;
     taskStatus: string;
     taskEndDate: string;
   };
+  onClose: () => void;
   onSave: (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => void;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ projectId, taskId, initialData, onSave }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ projectId,selectedTask,_id, initialData, onClose, onSave }) => {
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [taskEndDate, setTaskEndDate] = useState('');
   const [taskStatus, setTaskStatus] = useState('not completed');
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  console.log(projectId)
+  console.log(selectedTask)
 
   useEffect(() => {
     if (initialData) {
@@ -44,19 +52,42 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, taskId, initialData, onS
     }
   }; */
 
+  const handleSave = async (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => {
+    console.log("handle save chala Taskslists ka")
+    try {
+      if (_id) {
+        console.log({selectedTask})
+        console.log(_id)
+        await dispatch(updateTask({  projectId, _id: selectedTask._id , taskData }));
+        console.log("handle save chala Taskslists ka")
+      } else {
+        await dispatch(addTask({ projectId, taskData }));
+        console.log("handle save chala Taskslists ka")
+      }
+      dispatch(fetchTasks(projectId));
+    } catch (error) {
+      console.error('Error saving task:', error);
+      alert('Failed to save task. Please try again.');
+    }
+    onClose();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
    // const taskData = { projectId, taskTitle, taskDescription,taskEndDate, taskStatus };
    
     console.log("handle submit chala task form ka")
     setIsLoading(true);
-
+    const taskData = { taskTitle, taskDescription, taskStatus, taskEndDate };
+    handleSave(taskData)
     onSave({ taskTitle, taskDescription, taskStatus, taskEndDate });
 
     setIsLoading(false);
   
     console.log("Task saved successfully");
   };
+
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -102,7 +133,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, taskId, initialData, onS
         </Select>
       </FormControl>
       <Button mt={4} colorScheme="blue" type="submit" isLoading={isLoading}>
-        {taskId ? 'Update' : 'Create'} Task
+        {_id ? 'Update' : 'Create'} Task
       </Button>
     </form>
   );

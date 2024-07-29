@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '@/utils/api';
 
 interface Task {
-  taskId?: string | any;
+  _id?: string | any;
   taskTitle: string;
   taskDescription: string;
   taskStatus: string;
@@ -33,7 +33,7 @@ export const fetchTasks = createAsyncThunk<Task[], string>('tasks/fetchTasks', a
 });
 
 // Async thunk to add a new task
-export const addTask = createAsyncThunk<Task, { projectId: string; taskData: Omit<Task, 'taskId'> }>(
+export const addTask = createAsyncThunk<Task, { projectId: string; taskData: Omit<Task, '_id'> }>(
   'tasks/addTask',
   async ({ projectId, taskData }) => {
     const response = await api.post(`/projects/${projectId}/tasks`, taskData);
@@ -43,10 +43,11 @@ export const addTask = createAsyncThunk<Task, { projectId: string; taskData: Omi
 );
 
 // Async thunk to update an existing task
-export const updateTask = createAsyncThunk<Task, { projectId: string; taskId: string; taskData: Task }>(
+export const updateTask = createAsyncThunk<Task, { projectId: string; _id: string; taskData: Task }>(
   'tasks/updateTask',
-  async ({ projectId, taskId, taskData }) => {
-    const response = await api.put(`/projects/${projectId}/tasks/${taskId}`, taskData);
+  async ({ projectId, _id, taskData }) => {
+    console.log({_id},"updateTasksSlice");
+    const response = await api.put(`/projects/${projectId}/tasks/${_id}`, taskData);
     return response.data;
   }
 );
@@ -62,13 +63,13 @@ const tasksSlice = createSlice({
       state.tasks.push(action.payload);
     },
     updatedTask: (state, action: PayloadAction<Task>) => {
-      const index = state.tasks.findIndex(task => task.taskId === action.payload.taskId);
+      const index = state.tasks.findIndex(task => task._id === action.payload._id);
       if (index !== -1) {
         state.tasks[index] = action.payload;
       }
     },
     deleteTask: (state, action: PayloadAction<string>) => {
-      state.tasks = state.tasks.filter(task => task.taskId !== action.payload);
+      state.tasks = state.tasks.filter(task => task._id !== action.payload);
     },
     deleteTasksByProjectId: (state, action: PayloadAction<string>) => {
         state.tasks = state.tasks.filter(task => task.projectId !== action.payload);
@@ -91,7 +92,7 @@ const tasksSlice = createSlice({
         state.tasks.push(action.payload);
       })
       .addCase(updateTask.fulfilled, (state, action: PayloadAction<Task>) => {
-        const index = state.tasks.findIndex(task => task.taskId === action.payload.taskId);
+        const index = state.tasks.findIndex(task => task._id === action.payload._id);
         if (index !== -1) {
           state.tasks[index] = action.payload;
         }

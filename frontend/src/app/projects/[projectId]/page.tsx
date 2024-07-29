@@ -69,15 +69,15 @@ const ProjectDetails = () => {
       <p><strong>Created At:</strong> {new Date(project.createdAt).toLocaleString()}</p>
       <p><strong>Updated At:</strong> {new Date(project.updatedAt).toLocaleString()}</p>
 
-      <Button onClick={onOpen}>Add Task</Button>
+     {/*  <Button onClick={onOpen}>Add Task</Button> */}
       <Calendar projectId={project._id} refreshTasks={refreshTasks} />
 
-      <TaskModal
+   {/*    <TaskModal
         isOpen={isOpen}
         onClose={onClose}
         projectId={project?._id}
         onSave={handleSave}
-      />
+      /> */}
 
      {/*  {project._id && <UpdatedTaskList tasks={tasks} />} */}
     {/*   {project._id && <TaskList projectId={project._id} refreshTasks={refreshTasks}/>} */}

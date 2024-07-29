@@ -17,7 +17,7 @@ interface TaskListProps {
 
 // Define the task interface
 interface Task {
-  taskId?: string | any;
+  _id?: string | any;
   taskTitle: string;
   taskDescription: string;
   taskStatus: string;
@@ -70,7 +70,9 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
   };
 
   const handleEdit = (task: Task) => {
-    setSelectedTask(task);
+   // setSelectedTask(task);
+    console.log(selectedTask)
+    console.log(task)
     onOpen();
   };
 
@@ -78,7 +80,7 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
     console.log("handle save chala Taskslists ka")
     try {
       if (selectedTask) {
-        await dispatch(updateTask({  projectId, taskId: selectedTask.taskId , taskData }));
+        await dispatch(updateTask({  projectId, _id: selectedTask._id , taskData }));
         console.log("handle save chala Taskslists ka")
       } else {
         await dispatch(addTask({ projectId, taskData }));
@@ -117,14 +119,17 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
         </Select>
       </Box>
       {filteredTasks.map((task) => (
-        <div style={{border:"2px solid black",padding:"6px", gap:"2px"}} key={task?.taskId}>
+        <div style={{border:"2px solid black",padding:"12px", gap:"2px"}} key={task?._id}>
           <h1>{task?.taskTitle}</h1>
+         {/*  <h1>{task?.taskId}</h1> */}
+          <h1>{task?._id}</h1>
+          hiiii
           <h2>{task?.taskStatus}</h2>
           <p>{task?.taskDescription}</p>
           <p>End Date: {new Date(String(task?.taskEndDate)).toLocaleDateString()}</p>
           <p>{formatDaysLeft(String(task?.taskEndDate))}</p>
-          <Button onClick={() => handleEdit(task)}>Edit task</Button>
-          <Button onClick={() => handleDelete(task.taskId)}>Delete task</Button>
+          <Button onClick={() => {setSelectedTask(task); handleEdit(task);}}>Edit task</Button>
+          <Button onClick={() => handleDelete(task?._id)}>Delete task</Button>
         </div>
       ))}
 
@@ -133,7 +138,7 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
           isOpen={isOpen}
           onClose={onClose}
           projectId={projectId}
-          taskId={selectedTask.taskId}
+          _id={selectedTask._id}
           initialData={{
             taskTitle: selectedTask.taskTitle,
             taskDescription: selectedTask.taskDescription,
@@ -141,6 +146,7 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
             taskStatus: selectedTask.taskStatus
             
           }}
+          selectedTask={selectedTask}
           onSave={handleSave}
         />
       )}

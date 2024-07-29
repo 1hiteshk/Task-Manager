@@ -8,20 +8,22 @@ interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   projectId: string;
-  taskId?: string;
+  _id?: string;
+  selectedTask?:any;
   initialData?: TaskFormProps['initialData'];
   onSave: (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => void;
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, projectId, taskId, initialData, onSave }) => {
+const TaskModal: React.FC<TaskModalProps> = ({ isOpen, selectedTask,onClose, projectId, _id, initialData, onSave }) => {
+  console.log({_id})
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>{taskId ? 'Edit Task' : 'Add Task'}</ModalHeader>
+        <ModalHeader>{_id ? 'Edit Task' : 'Add Task'}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <TaskForm projectId={projectId} taskId={taskId} initialData={initialData} onSave={onSave} />
+          <TaskForm projectId={projectId} onClose={onClose} selectedTask={selectedTask} _id={_id} initialData={initialData} onSave={onSave} />
         </ModalBody>
         <ModalFooter>
           <Button onClick={onClose}>Cancel</Button>

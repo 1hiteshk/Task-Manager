@@ -1,8 +1,9 @@
 // components/Calendar.tsx
 import React, { useState } from 'react';
-import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Text, useDisclosure } from '@chakra-ui/react';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 import TaskList from './TaskLists';
+import TaskModal from './TaskModal';
 
 interface CalendarProps {
   projectId: string;
@@ -12,7 +13,11 @@ interface CalendarProps {
 const Calendar: React.FC<CalendarProps> = ({ projectId, refreshTasks }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const handleSave = () => {
+   // setRefreshTasks(prev => !prev); // Toggle refreshTasks state
+    onClose();
+  };
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
 
   const handleDateClick = (date: Date) => {
@@ -45,7 +50,13 @@ const Calendar: React.FC<CalendarProps> = ({ projectId, refreshTasks }) => {
     <Box>
       <Flex justifyContent="space-between" alignItems="center" mb="4">
       <Heading size="md">{format(currentDate, 'dd MMMM, yyyy')}</Heading>
-        <Button colorScheme="purple">+ Add Task</Button>
+        <Button colorScheme="purple" onClick={onOpen}>+ Add Task</Button>
+        <TaskModal
+        isOpen={isOpen}
+        onClose={onClose}
+        projectId={projectId}
+        onSave={handleSave}
+      />
       </Flex>
       <Flex justifyContent="space-between">
         {renderWeekDays()}

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Flex, Heading, Stack, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react';
 import api from '@/utils/api';
 import ProjectCard from '@/components/cards/ProjectCard';
 import TaskList from '@/components/TaskLists';
@@ -95,8 +95,9 @@ const Home =()=> {
   const selectedProjectFromIndex = userProjects[currentIndex];
 
   return (
-    <div>
-      <Heading as="h1">Hello, {userDetails?.username}</Heading>
+    <Box bgColor={'#f2f5ff'} p={'20px 40px'}>
+      <Heading color={'#2E3A59'} as="h1">Hello, {userDetails?.username}!</Heading>
+      <Text>Have a nice day</Text>
       <Flex justify="center" align="center" mt={4}>
         {userProjects.length === 0 ? (
           <Stack>
@@ -147,7 +148,7 @@ const Home =()=> {
           refreshTasks={refreshTasks}
         />
       )}
-    </div>
+    </Box>
   );
 }
 
