@@ -38,10 +38,8 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
    const taskStatus = useSelector((state: RootState) => state.tasks.status);
 
    useEffect(() => {
-    if (taskStatus === 'idle') {
       dispatch(fetchTasks(projectId));
-    }
-  }, [dispatch, projectId, taskStatus]);
+  }, [projectId]);
 
   useEffect(() => {
     filterTasks();
