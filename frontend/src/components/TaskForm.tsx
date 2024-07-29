@@ -12,7 +12,7 @@ export interface TaskFormProps {
     taskStatus: string;
     taskEndDate: string;
   };
-  onSave: () => void;
+  onSave: (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => void;
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ projectId, taskId, initialData, onSave }) => {
@@ -31,34 +31,30 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId, taskId, initialData, onS
     }
   }, [initialData]);
 
-  const handleSaveTask = async (taskData: any, headers: any) => {
+ /*  const handleSaveTask = async (taskData: any) => {
     try {
       if (taskId) {
-        await api.put(`/projects/${projectId}/tasks/${taskId}`, taskData, { headers });
+        await api.put(`/projects/${projectId}/tasks/${taskId}`, taskData);
       } else {
-        await api.post(`/projects/${projectId}/tasks`, taskData, { headers });
+        await api.post(`/projects/${projectId}/tasks`, taskData);
       }
     } catch (error) {
       console.error('Error saving task:', error);
       alert('Failed to save task. Please try again.');
     }
-  };
+  }; */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const taskData = { projectId, taskTitle, taskDescription,taskEndDate, taskStatus };
-    const token = localStorage.getItem('token'); // Get the token from local storage
-
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
-
+   // const taskData = { projectId, taskTitle, taskDescription,taskEndDate, taskStatus };
+   
+    console.log("handle submit chala task form ka")
     setIsLoading(true);
 
-    await handleSaveTask(taskData, headers);
+    onSave({ taskTitle, taskDescription, taskStatus, taskEndDate });
 
     setIsLoading(false);
-    onSave();
+  
     console.log("Task saved successfully");
   };
 

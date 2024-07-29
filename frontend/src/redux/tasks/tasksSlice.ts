@@ -1,21 +1,55 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import api from '@/utils/api';
 
 interface Task {
-  taskId: string;
+  taskId?: string | any;
   taskTitle: string;
   taskDescription: string;
   taskStatus: string;
-  taskEndDate: string;
-  projectId: string;
+  taskEndDate?: string | any;
+  projectId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface TasksState {
   tasks: Task[];
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
 }
 
 const initialState: TasksState = {
   tasks: [],
+  status: 'idle',
+  error: null,
 };
+
+
+// Async thunk to fetch tasks
+export const fetchTasks = createAsyncThunk<Task[], string>('tasks/fetchTasks', async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/tasks`);
+  console.log({alltasks:response.data})
+  return response.data;
+});
+
+// Async thunk to add a new task
+export const addTask = createAsyncThunk<Task, { projectId: string; taskData: Omit<Task, 'taskId'> }>(
+  'tasks/addTask',
+  async ({ projectId, taskData }) => {
+    const response = await api.post(`/projects/${projectId}/tasks`, taskData);
+    console.log({task: response.data});
+    return response.data;
+  }
+);
+
+// Async thunk to update an existing task
+export const updateTask = createAsyncThunk<Task, { projectId: string; taskId: string; taskData: Task }>(
+  'tasks/updateTask',
+  async ({ projectId, taskId, taskData }) => {
+    const response = await api.put(`/projects/${projectId}/tasks/${taskId}`, taskData);
+    return response.data;
+  }
+);
 
 const tasksSlice = createSlice({
   name: 'tasks',
@@ -24,10 +58,10 @@ const tasksSlice = createSlice({
     setTasks: (state, action: PayloadAction<Task[]>) => {
       state.tasks = action.payload;
     },
-    addTask: (state, action: PayloadAction<Task>) => {
+    addedTask: (state, action: PayloadAction<Task>) => {
       state.tasks.push(action.payload);
     },
-    updateTask: (state, action: PayloadAction<Task>) => {
+    updatedTask: (state, action: PayloadAction<Task>) => {
       const index = state.tasks.findIndex(task => task.taskId === action.payload.taskId);
       if (index !== -1) {
         state.tasks[index] = action.payload;
@@ -40,8 +74,31 @@ const tasksSlice = createSlice({
         state.tasks = state.tasks.filter(task => task.projectId !== action.payload);
       },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTasks.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchTasks.fulfilled, (state, action: PayloadAction<Task[]>) => {
+        state.status = 'succeeded';
+        state.tasks = action.payload;
+      })
+      .addCase(fetchTasks.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to fetch tasks';
+      })
+      .addCase(addTask.fulfilled, (state, action: PayloadAction<Task>) => {
+        state.tasks.push(action.payload);
+      })
+      .addCase(updateTask.fulfilled, (state, action: PayloadAction<Task>) => {
+        const index = state.tasks.findIndex(task => task.taskId === action.payload.taskId);
+        if (index !== -1) {
+          state.tasks[index] = action.payload;
+        }
+      });
+  },
 });
 
-export const { setTasks, addTask, updateTask, deleteTask ,deleteTasksByProjectId} = tasksSlice.actions;
+export const { setTasks, addedTask, updatedTask, deleteTask ,deleteTasksByProjectId} = tasksSlice.actions;
 
 export default tasksSlice.reducer;

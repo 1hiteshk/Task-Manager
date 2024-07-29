@@ -1,49 +1,56 @@
 "use client";
-import { useState, useEffect } from "react";
-import api from "@/utils/api";
-import ProjectCard from "@/components/cards/ProjectCard";
-import userProfile from "@/hooks/userProfile";
-import { useDispatch, useSelector } from "react-redux";
-import { setUserProjects } from "@/redux/projects/projectsSlice";
-import { RootState } from "../store";
-import TaskList from "@/components/TaskLists";
-import Link from "next/link";
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Stack,
-  useDisclosure,
-} from "@chakra-ui/react";
-import ProjectModal from "@/components/ProjectModal";
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Box, Button, Flex, Heading, Stack, useDisclosure } from '@chakra-ui/react';
+import api from '@/utils/api';
+import ProjectCard from '@/components/cards/ProjectCard';
+import TaskList from '@/components/TaskLists';
+import ProjectModal from '@/components/ProjectModal';
+import { fetchProjects } from '@/redux/projects/projectsSlice';
+import { RootState, AppDispatch } from '@/app/store'; 
+import { fetchUserInfo } from '@/redux/user/userInfoSlice';
 
 interface Project {
   _id: string;
   projectNumber: string;
   projectTitle: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string | any;
+  updatedAt?: string | any;
 }
 
-export default function Home() {
-  const [projects, setProjects] = useState<Project[]>([]);
+const Home =()=> {
+ // const [projects, setProjects] = useState<Project[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [refreshTasks, setRefreshTasks] = useState<boolean>(false);
   const [isEditProject, setIsEditProject] = useState<boolean>(false);
-
-  const userDetails = userProfile(); // Get the user profile using the custom hook
-  const dispatch = useDispatch();
-  const userProjects = useSelector(
-    (state: RootState) => state.projects.projects
-  );
+  const dispatch = useDispatch<AppDispatch>();
+  const userProjects = useSelector( (state: RootState) => state.projects.projects );
+  // Access user details from Redux store
+  const userDetails = useSelector((state: RootState) => state.userDetails);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  console.log(userProjects[1]?._id, "userProjects");
-
   const currentDate = new Date();
 
-  const fetchProjects = async () => {
+  
+
+ // Fetch user details if not already in the store
+ useEffect(() => {
+  if (!userDetails.username) {
+    dispatch(fetchUserInfo());
+  }
+}, [dispatch, userDetails]);
+ 
+  console.log(userProjects[1]?._id, "userProjects");
+
+  useEffect(() => {
+    if (userProjects.length === 0) {
+      dispatch(fetchProjects());
+    }
+  }, [dispatch, userProjects.length]);
+
+ 
+
+  /* const fetchProjects = async () => {
     try {
       const res = await api.get("/projects");
       console.log(res);
@@ -52,24 +59,24 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching projects:", error);
     }
-  };
+  }; */
 
-  useEffect(() => {
+ /*  useEffect(() => {
     fetchProjects();
-  }, [dispatch]);
+  }, [dispatch]); */
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % projects.length);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % userProjects.length);
   };
 
   const handlePrev = () => {
     setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + projects.length) % projects.length
+      (prevIndex) => (prevIndex - 1 + userProjects.length) % userProjects.length
     );
   };
 
   const handleSave = () => {
-    fetchProjects();
+    dispatch(fetchProjects());
     setRefreshTasks(!refreshTasks);
     onClose();
   };
@@ -85,13 +92,13 @@ export default function Home() {
     onOpen();
   };
 
-  const selectedProjectFromIndex = projects[currentIndex];
+  const selectedProjectFromIndex = userProjects[currentIndex];
 
   return (
     <div>
       <Heading as="h1">Hello, {userDetails?.username}</Heading>
       <Flex justify="center" align="center" mt={4}>
-        {projects.length === 0 ? (
+        {userProjects.length === 0 ? (
           <Stack>
             <Heading>No projects found</Heading>
             <Button onClick={handleAddProject}>Create a new project</Button>
@@ -101,12 +108,9 @@ export default function Home() {
             <Button onClick={handlePrev}>&lt;</Button>
             <Box mx={4}>
               {selectedProjectFromIndex && (
-                <Link
-                  href={`/projects/${selectedProjectFromIndex?._id}`}
-                  key={selectedProjectFromIndex?._id}
-                >
-                  <ProjectCard data={selectedProjectFromIndex} />
-                </Link>
+              
+                  <ProjectCard key={selectedProjectFromIndex?._id} data={selectedProjectFromIndex} />
+               
               )}
             </Box>
             <Button onClick={handleNext}>&gt;</Button>
@@ -146,3 +150,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default Home;

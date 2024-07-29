@@ -1,9 +1,12 @@
+'use client'
 import { useEffect, useState } from 'react';
 import api from '../utils/api';
 import { Box, Button, Heading, Select, useDisclosure } from '@chakra-ui/react';
 import TaskModal from '@/components/TaskModal';
 import { formatDaysLeft } from '@/utils/formatDate';
-import { isSameDay } from 'date-fns';
+import { fetchTasks, addTask, updateTask, deleteTask } from '@/redux/tasks/tasksSlice';
+import { RootState, AppDispatch } from '@/app/store';
+import { useDispatch, useSelector } from 'react-redux';
 
 // Define the props interface
 interface TaskListProps {
@@ -14,45 +17,37 @@ interface TaskListProps {
 
 // Define the task interface
 interface Task {
-  _id: string;
+  taskId?: string | any;
   taskTitle: string;
   taskDescription: string;
   taskStatus: string;
-  taskEndDate?: string;
+  taskEndDate?: string | any;
   createdAt?: string;
   // Add any other fields you may have in your task data
 }
 
 const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
    // console.log(selectedDate)
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [filter, setFilter] = useState<string>('all');
-  const { isOpen, onOpen, onClose } = useDisclosure();
+   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+   const [filter, setFilter] = useState<string>('all');
+   const { isOpen, onOpen, onClose } = useDisclosure();
 
- 
+   const dispatch = useDispatch<AppDispatch>();
+   const tasks = useSelector((state: RootState) => state.tasks.tasks);
+   const taskStatus = useSelector((state: RootState) => state.tasks.status);
 
-  const fetchTasks = async () => {
-    
-  try {
-    const res = await api.get(`/projects/${projectId}/tasks`);
-    console.log({value : res.data})
-    setTasks(res.data);
-    /* setFilteredTasks(res.data); */
-  } catch (error) {
-    console.error('Error fetching tasks:', error);
-  }
-};
-
-
-  useEffect(() => {
-    fetchTasks();
-  }, [projectId,refreshTasks]);
+   useEffect(() => {
+    if (taskStatus === 'idle') {
+      dispatch(fetchTasks(projectId));
+    }
+  }, [dispatch, projectId, taskStatus]);
 
   useEffect(() => {
     filterTasks();
-  }, [selectedDate,filter, tasks]);
+  }, [selectedDate, filter, tasks]);
+
+
 
   const filterTasks = () => {
     let filtered = tasks.filter(task => {
@@ -79,8 +74,21 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
     onOpen();
   };
 
-  const handleSave = () => {
-    fetchTasks(); // Refetch tasks after saving
+  const handleSave = async (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => {
+    console.log("handle save chala Taskslists ka")
+    try {
+      if (selectedTask) {
+        await dispatch(updateTask({  projectId, taskId: selectedTask.taskId , taskData }));
+        console.log("handle save chala Taskslists ka")
+      } else {
+        await dispatch(addTask({ projectId, taskData }));
+        console.log("handle save chala Taskslists ka")
+      }
+      dispatch(fetchTasks(projectId));
+    } catch (error) {
+      console.error('Error saving task:', error);
+      alert('Failed to save task. Please try again.');
+    }
     onClose();
   };
 
@@ -88,7 +96,7 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
     
     try {
       await api.delete(`/projects/${projectId}/tasks/${taskId}`);
-      setTasks(tasks.filter(task => task._id !== taskId)); // Update the task list
+      dispatch(deleteTask(taskId));
     } catch (error) {
       console.error('Error deleting task:', error);
     }
@@ -109,14 +117,14 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
         </Select>
       </Box>
       {filteredTasks.map((task) => (
-        <div style={{border:"2px solid black",padding:"6px", gap:"2px"}} key={task?._id}>
+        <div style={{border:"2px solid black",padding:"6px", gap:"2px"}} key={task?.taskId}>
           <h1>{task?.taskTitle}</h1>
           <h2>{task?.taskStatus}</h2>
           <p>{task?.taskDescription}</p>
           <p>End Date: {new Date(String(task?.taskEndDate)).toLocaleDateString()}</p>
           <p>{formatDaysLeft(String(task?.taskEndDate))}</p>
           <Button onClick={() => handleEdit(task)}>Edit task</Button>
-          <Button onClick={() => handleDelete(task._id)}>Delete task</Button>
+          <Button onClick={() => handleDelete(task.taskId)}>Delete task</Button>
         </div>
       ))}
 
@@ -125,7 +133,7 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
           isOpen={isOpen}
           onClose={onClose}
           projectId={projectId}
-          taskId={selectedTask._id}
+          taskId={selectedTask.taskId}
           initialData={{
             taskTitle: selectedTask.taskTitle,
             taskDescription: selectedTask.taskDescription,

@@ -11,6 +11,7 @@ const userProfile = async () => {
 
   const parts = token.split('.');
   const payload = JSON.parse(atob(parts[1]));
+  console.log(payload.user)
 
   return payload.user;
 };

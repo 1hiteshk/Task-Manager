@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { FormControl, FormLabel, Input, Button } from '@chakra-ui/react';
 import api from '@/utils/api';
-import { useDispatch } from 'react-redux';
-import { addUserProject, updateUserProject } from '@/redux/projects/projectsSlice';
-import userProfile from '@/hooks/userProfile';
+import { useDispatch, useSelector } from 'react-redux';
+import { addProject, addUserProject, fetchProjects, updateProject, updateUserProject } from '@/redux/projects/projectsSlice';
+import { fetchUserInfo } from '@/redux/user/userInfoSlice';
+import { AppDispatch, RootState } from '@/app/store';
 
 export interface ProjectFormProps {
-  projectId?: string;
+  projectId?: string | any;
   initialData?: {
     projectTitle: string;
     projectNumber: string;
@@ -21,38 +22,38 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, initialData, onSav
     const [projectTitle, setProjectTitle] = useState(initialData?.projectTitle || '');
     const [projectNumber, setProjectNumber] = useState(initialData?.projectNumber || '');
   const [isLoading, setIsLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState<any>();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const user = await userProfile();
-      setUserDetails(user);
-    };
-    fetchUserProfile();
-  }, []);
+  // Access user details from Redux store
+  const userDetails = useSelector((state: RootState) => state.userDetails);
 
-  useEffect(() => {
-    if (initialData) {
-      setProjectTitle(initialData.projectTitle);
-      setProjectNumber(initialData.projectNumber);
-    }
-  }, [initialData]);
+ // Fetch user details if not already in the store
+ useEffect(() => {
+  if (!userDetails.id) {
+    dispatch(fetchUserInfo());
+  }
+}, [dispatch, userDetails]);
+
+ 
 
   const handleSaveProject = async () => {
-    const projectData = { userId: String(userDetails?.id), projectTitle, projectNumber };
-    const projectDataToUpdate = { _id: projectId, ...projectData };
+     if (!userDetails.id) {
+      alert('User details are not available');
+      return;
+    }
+    const projectData = { userId: String(userDetails?.id), projectTitle, projectNumber }; 
+   // const projectDataToUpdate = { _id: projectId, ...projectData }; 
 
     setIsLoading(true);
 
     try {
       if (projectId) {
-        await api.put(`/projects/${projectId}`, projectData);
-        dispatch(updateUserProject(projectDataToUpdate));
+        await dispatch(updateProject({ ...projectData, _id: projectId }));
       } else {
-        await api.post('/projects', projectData);
-        dispatch(addUserProject(projectDataToUpdate));
+        await dispatch(addProject(projectData));
       }
+      dispatch(fetchProjects());
+      //Dispatched fetchProjects to refresh the projects list after adding or updating a project.
       onSave();
     } catch (error) {
       console.error('Error saving project:', error);
@@ -78,6 +79,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, initialData, onSav
       <FormControl mt={4}>
         <FormLabel>Project Number</FormLabel>
         <Input
+          type="number"
+          min={1}
           value={projectNumber}
           onChange={(e) => setProjectNumber(e.target.value)}
           placeholder="Project Number"

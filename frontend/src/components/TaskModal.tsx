@@ -10,7 +10,7 @@ interface TaskModalProps {
   projectId: string;
   taskId?: string;
   initialData?: TaskFormProps['initialData'];
-  onSave: () => void;
+  onSave: (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => void;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, projectId, taskId, initialData, onSave }) => {
