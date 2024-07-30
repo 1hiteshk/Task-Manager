@@ -1,58 +1,60 @@
-"use client";
 
-import React, { useEffect, useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import api from "@/utils/api";
-import TaskList from "@/components/TaskLists";
-import { Box, Button, Flex, Heading, Stack, Text, useDisclosure, useToast } from "@chakra-ui/react";
-import TaskModal from "@/components/TaskModal";
-import UpdatedTaskList from "@/components/UpdatedTaskList";
-import Calendar from "@/components/Calendar";
-import { RootState } from '@/redux/store'
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addUserProject,
-  fetchByProjectId,
-  fetchProjectById,
-  removeUserProject,
-} from "@/redux/projects/projectsSlice";
-import ProjectModal from "@/components/ProjectModal";
-import { deleteTasksByProjectId } from "@/redux/tasks/tasksSlice";
-import CustomToast from "@/components/toast/CustomToast";
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import api from '@/utils/api';
+import TaskList from '@/components/TaskLists';
+import { Box, Button, Flex, Stack, useDisclosure, useToast } from '@chakra-ui/react';
+import TaskModal from '@/components/TaskModal';
+import UpdatedTaskList from '@/components/UpdatedTaskList';
+import Calendar from '@/components/Calendar';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
+import { isEmpty, isUserLoggedIn } from '@/utils/helpers';
+import { fetchProjectDetails } from '@/redux/projects/projectDetailsSlice';
+import { API_STATUS } from '@/config/constantMaps';
+import { removeUserProject } from '@/redux/projects/projectsSlice';
+import CustomToast from '@/components/toast/CustomToast';
+import  { ProjectCardDetails } from '@/components/cards/ProjectDetailsCard';
+import ProjectModal from '@/components/ProjectModal';
+import { deleteTasksByProjectId } from '@/redux/tasks/tasksSlice';
 
 // Define the project interface
 interface Project {
   _id: string;
   projectNumber: number;
   projectTitle: string;
-  userId: string | any;
-  createdAt?: string;
-  updatedAt?: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const ProjectDetails = () => {
   const params = useParams();
   const router = useRouter();
-  const projectId = params?.projectId;
+  const id = params?.projectId as string;
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<any[]>([]); // Replace 'any[]' with the actual task interface
-  const [loading, setLoading] = useState<boolean>(true);
   const [refreshTasks, setRefreshTasks] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const dispatch = useDispatch();
-  const userProjects = useSelector(
-    (state: RootState) => state.projects.projects
-  );
-  // Access user details from Redux store
-  const userId = useSelector((state: RootState) => state.userDetails.id);
-  
+
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    status,
+    projectDetailsMap,
+    error
+  } = useSelector( (state: RootState) => state.projectDetails );
+
+  const projectDetails = projectDetailsMap?.[id];
+
   const toast = useToast();
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/projects/${project?._id}`); // Make API call to delete project
-      dispatch(removeUserProject(String(project?._id))); // Dispatch action to update the Redux state
-      dispatch(deleteTasksByProjectId(String(project?._id)));
+      await api.delete(`/projects/${projectDetails?._id}`); // Make API call to delete project
+      dispatch(removeUserProject(String(projectDetails?._id))); // Dispatch action to update the Redux state
+      dispatch(deleteTasksByProjectId(String(projectDetails?._id)));
       toast({
         duration: 5000,
         position: 'bottom-right',
@@ -60,8 +62,8 @@ const ProjectDetails = () => {
         render: ({onClose}) => (
           <CustomToast
             duration={5000}
-            title={`Project ${project?.projectNumber} deleted.`}
-            description={`The project ${project?.projectTitle} and its associated tasks have been deleted.`}
+            title={`Project ${projectDetails?.projectNumber} deleted.`}
+            description={`The project ${projectDetails?.projectTitle} and its associated tasks have been deleted.`}
             status="success"
             onClose={onClose}
           />
@@ -76,7 +78,7 @@ const ProjectDetails = () => {
         render: ({ onClose }) => (
           <CustomToast
             duration={5000}
-            title={`Error deleting project ${project?.projectNumber}.`}
+            title={`Error deleting project ${projectDetails?.projectNumber}.`}
             description="There was an error deleting the project."
             status="error"
             onClose={onClose}
@@ -86,90 +88,77 @@ const ProjectDetails = () => {
     }
     router.push(`/projects`);
   };
- 
-  useEffect(() => {
-    const fetchProject = async () => {
-      if (projectId) {
-        const existingProject = userProjects.find(
-          (project) => project._id === projectId
-        );
-        if (existingProject) {
-          setProject(existingProject);
-          setLoading(false);
-        } else {
-          const newProject = await fetchByProjectId(String(projectId));
-          setProject(newProject as any);
-          const project2 = { newProject, userId };
-          dispatch(addUserProject(project2 as any));
-          setLoading(false);
-        }
-      }
-    };
-    fetchProject();
-  }, [projectId,refreshTasks]);
 
-  console.log({ userProjects });
+
+  useEffect(() => {
+    // If user is not logged in then redirect to login screen
+    if (!isUserLoggedIn()) {
+      router.push('/auth');
+    }
+  }, []);
+
+  // Will try to fetch project details if not already found in redux store
+  useEffect(() => {
+    if (isEmpty(projectDetails) && id) {
+      dispatch(fetchProjectDetails(id));
+    }
+  }, [id]);
+
 
   const handleSave = () => {
-    setRefreshTasks((prev) => !prev); // Toggle refreshTasks state
+    setRefreshTasks(prev => !prev); // Toggle refreshTasks state
     onClose();
   };
 
-  if (loading) {
+  if (status === API_STATUS.LOADING) {
     return <div>Loading...</div>;
   }
 
-  if (!project) {
-    return <div>Project not found or an error occurred.</div>;
+  if(error) {
+    return <div>Show error state</div>;
   }
+
+  if (isEmpty(projectDetails)) {
+    return <div>Project not found</div>;
+  }
+
+  const {
+    projectTitle, projectNumber, createdAt, updatedAt, _id
+  } = projectDetails ?? {};
 
   return (
     <Box borderWidth="1px" borderRadius="lg" p={6} mb={4} bg="white" boxShadow="lg">
-     <Flex alignItems={'center'} justifyContent={'space-between'}>
-     <Heading as="h1" size="lg" mb={4}>
-      Project Details
-    </Heading>
-     <Stack gap={2} >
-     <Button colorScheme="purple" onClick={onOpen}>Edit Projects</Button>
-     <Button colorScheme="red" onClick={handleDelete}>Delete Project</Button>
+      <Flex justifyContent={'space-between'}>
+      <ProjectCardDetails project={projectDetails}/>
+      <Stack gap={2} >
+     <Button colorScheme='blue' onClick={onOpen}>Edit Projects</Button>
+     <Button colorScheme="purple" onClick={handleDelete}>Delete Project</Button>
      </Stack>
-     </Flex>
-    <Flex direction="column" mb={4}>
-      <Text fontWeight="bold">
-        Project Title: <Text as="span" fontWeight="normal">{project.projectTitle}</Text>
-      </Text>
-      <Text fontWeight="bold">
-        Project Number: <Text as="span" fontWeight="normal">{project.projectNumber}</Text>
-      </Text>
-      <Text fontWeight="bold">
-        Created At: <Text as="span" fontWeight="normal">{new Date(String(project.createdAt)).toLocaleString()}</Text>
-      </Text>
-      <Text fontWeight="bold">
-        Updated At: <Text as="span" fontWeight="normal">{new Date(String(project.updatedAt)).toLocaleString()}</Text>
-      </Text>
-    </Flex>
 
-    {/* <Button onClick={onOpen}>Add Task</Button> */}
-    <Calendar projectId={project._id} refreshTasks={refreshTasks} />
+      </Flex>
+      
 
-    <ProjectModal
+     {/*  <Button onClick={onOpen}>Add Task</Button> */}
+      <Calendar projectId={_id} refreshTasks={refreshTasks} />
+
+      <ProjectModal
         isOpen={isOpen}
         onClose={onClose}
-        projectId={project?._id}
+        projectId={_id}
         initialData={
-          project
+          projectDetails
             ? {
-                projectTitle: project.projectTitle,
-                projectNumber: project.projectNumber,
+                projectTitle: projectTitle,
+                projectNumber: projectNumber,
               }
             : undefined
         }
         onSave={handleSave}
       />
 
-    {project._id && <UpdatedTaskList tasks={tasks} />}
-    {project._id && <TaskList projectId={project._id} refreshTasks={refreshTasks} />}
-  </Box>
+     {/*  {project._id && <UpdatedTaskList tasks={tasks} />} */}
+    {/*   {project._id && <TaskList projectId={project._id} refreshTasks={refreshTasks}/>} */}
+    </Box>
   );
 };
 

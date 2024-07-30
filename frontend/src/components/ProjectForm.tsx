@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addProject, addUserProject, fetchProjects, updateProject, updateUserProject } from '@/redux/projects/projectsSlice';
 import { fetchUserInfo } from '@/redux/user/userInfoSlice';
 import { AppDispatch, RootState } from '@/redux/store'
+import { fetchProjectDetails } from '@/redux/projects/projectDetailsSlice';
 
 export interface ProjectFormProps {
   projectId?: string | any;
@@ -23,6 +25,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, initialData, onSav
     const [projectNumber, setProjectNumber] = useState<number>(initialData?.projectNumber ?? 0);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  /* console.log({initialData});
+  console.log({projectTitle});
+  console.log({projectNumber}); */
 
   // Access user details from Redux store
   const userDetails = useSelector((state: RootState) => state.userDetails);
@@ -53,6 +58,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, initialData, onSav
         await dispatch(addProject(projectData));
       }
       dispatch(fetchProjects());
+      dispatch(fetchProjectDetails(projectId));
       //Dispatched fetchProjects to refresh the projects list after adding or updating a project.
       onSave();
     } catch (error) {

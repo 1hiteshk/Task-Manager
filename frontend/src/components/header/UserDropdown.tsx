@@ -1,5 +1,5 @@
+"use client";
 import { RiLogoutCircleRLine } from "react-icons/ri";
-import { RootState } from "@/app/store";
 import useCookie from "@/hooks/cookie/useCookie";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +8,9 @@ import { Box, Flex, Icon, Text } from "@chakra-ui/react";
 import { FaAngleDown } from "react-icons/fa";
 import Image from "next/image";
 import { userLogout } from "@/redux/login/loginSlice";
+import { isUserLoggedIn } from "@/utils/helpers";
+import { RootState } from "@/redux/store";
+import { setUserInfo } from "@/redux/user/userInfoSlice";
 
 interface Option {
   name: string;
@@ -27,10 +30,12 @@ const UserDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { removeCookie, getCookie } = useCookie();
-  const isLoggedIn = localStorage.getItem('token') || getCookie('token') ;
-  console.log(isLoggedIn);
-  console.log(!isLoggedIn);
-  console.log(!!isLoggedIn);
+  const userId = useSelector((state: RootState) => state.userDetails);
+  const isLogin = useSelector((state: RootState) => state.user.isLoggedIn) || userId;
+  const isLoggedIn = isUserLoggedIn() ;
+  console.log({ isLoggedIn });
+  // console.log(!isLoggedIn);
+  //console.log(!!isLoggedIn);
   const dispatch = useDispatch();
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState(options[0].name);
@@ -38,9 +43,16 @@ const UserDropdown: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     removeCookie("token");
-     dispatch(userLogout());
+    dispatch(userLogout());
+    dispatch(setUserInfo(null));
+    isUserLoggedIn();
     router.push("/auth");
     console.log("logged out");
+  };
+
+  const handleClick = () => {
+    if(!isLoggedIn)
+      router.push("/auth");
   };
 
   const handleSelectChange = (opt: string) => {
@@ -53,7 +65,10 @@ const UserDropdown: React.FC = () => {
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
       setIsOpen(false);
     }
   };
@@ -74,13 +89,25 @@ const UserDropdown: React.FC = () => {
         padding="8px 4px"
         cursor="pointer"
       >
-        <Flex justifyContent="center" alignItems="center" gap="10px">
-        <Image src={'/images/userLogo.svg'} alt="project" width={40} height={40} />
-         {isLoggedIn &&  <FaAngleDown />}
+        <Flex
+          cursor={isLoggedIn ? "" : "pointer"}
+          onClick={handleClick}
+          title={isLoggedIn ? "" : "login"}
+          justifyContent="center"
+          alignItems="center"
+          gap="10px"
+        >
+          <Image
+            src={"/images/userLogo.svg"}
+            alt="project"
+            width={40}
+            height={40}
+          />
+          {isLogin && <FaAngleDown />}
         </Flex>
       </Box>
 
-      { (isOpen && isLoggedIn) && (
+      {isOpen && isLogin && (
         <Box
           position="absolute"
           top="100%"
@@ -91,7 +118,7 @@ const UserDropdown: React.FC = () => {
           zIndex="1"
           boxShadow="0 4px 8px rgba(0,0,0,0.1)"
           bgColor="#0c8ce9"
-          color={'#fff'}
+          color={"#fff"}
         >
           {options.map((opt, i) => (
             <Box
@@ -111,7 +138,6 @@ const UserDropdown: React.FC = () => {
                 color: "#0a487e",
                 borderRadius: "6px",
               }}
-             
               padding="8px 10px"
               width="full"
               display="flex"
@@ -120,7 +146,7 @@ const UserDropdown: React.FC = () => {
               gap="6px"
             >
               <Icon fontWeight={700} as={opt.icon} />
-              <Text /* _hover={{ color: "#0a487e" }} color='#fff' */ fontWeight={600} >{opt.name}</Text>
+              <Text fontWeight={600}>{opt.name}</Text>
             </Box>
           ))}
         </Box>

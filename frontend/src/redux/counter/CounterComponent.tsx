@@ -1,6 +1,6 @@
 'use client';
 import { UseSelector, useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/app/store";
+import { RootState, AppDispatch } from "@/redux/store";
 import { increment,decrement,incrementByAmount } from "./counterSlice"; 
 
 const CounterComponent = () => {

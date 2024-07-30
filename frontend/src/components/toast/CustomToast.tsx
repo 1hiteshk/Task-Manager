@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { Box, Progress, UseToastOptions, CloseButton } from '@chakra-ui/react';
 
@@ -22,7 +23,6 @@ const CustomToast: React.FC<CustomToastProps> = ({ duration, title, description,
         const newProgress = oldProgress - decrement;
         if (newProgress <= 0) {
           clearInterval(timer);
-          onClose();
           return 0;
         }
         return newProgress;
@@ -32,7 +32,13 @@ const CustomToast: React.FC<CustomToastProps> = ({ duration, title, description,
     return () => {
       clearInterval(timer);
     };
-  }, [duration, onClose]);
+  }, [duration]);
+
+  useEffect(() => {
+    if (progress <= 0) {
+      onClose();
+    }
+  }, [progress, onClose]);
 
   const bgColor = status === 'error' ? 'red.200' : 'green.200'; // Light red for error and light green for success
 
