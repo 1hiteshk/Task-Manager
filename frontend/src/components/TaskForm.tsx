@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, FormControl, FormLabel, Input, Textarea, Select } from '@chakra-ui/react';
 import api from '../utils/api';
 import { addTask, fetchTasks, updateTask } from '@/redux/tasks/tasksSlice';
-import { AppDispatch } from '@/app/store';
+import { AppDispatch } from '@/redux/store'
 import { useDispatch } from 'react-redux';
 
 export interface TaskFormProps {
@@ -39,19 +39,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId,selectedTask,_id, initial
     }
   }, [initialData]);
 
- /*  const handleSaveTask = async (taskData: any) => {
-    try {
-      if (taskId) {
-        await api.put(`/projects/${projectId}/tasks/${taskId}`, taskData);
-      } else {
-        await api.post(`/projects/${projectId}/tasks`, taskData);
-      }
-    } catch (error) {
-      console.error('Error saving task:', error);
-      alert('Failed to save task. Please try again.');
-    }
-  }; */
-
+ 
   const handleSave = async (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => {
     console.log("handle save chala Taskslists ka")
     try {

@@ -2,7 +2,7 @@ import useCookie from './cookie/useCookie';
 
 const userProfile = async () => {
   const { getCookie } = useCookie();
-  const token = getCookie('token') || localStorage.getItem('token');
+  const token = getCookie('token') || (typeof window !== 'undefined' && localStorage.getItem('token'));
 
   if (!token) {
     console.error('Token is not available');

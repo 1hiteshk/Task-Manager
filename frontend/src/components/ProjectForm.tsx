@@ -6,13 +6,13 @@ import api from '@/utils/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProject, addUserProject, fetchProjects, updateProject, updateUserProject } from '@/redux/projects/projectsSlice';
 import { fetchUserInfo } from '@/redux/user/userInfoSlice';
-import { AppDispatch, RootState } from '@/app/store';
+import { AppDispatch, RootState } from '@/redux/store'
 
 export interface ProjectFormProps {
   projectId?: string | any;
   initialData?: {
     projectTitle: string;
-    projectNumber: string;
+    projectNumber: number;
   };
   onSave: () => void;
   onClose: () => void;
@@ -20,7 +20,7 @@ export interface ProjectFormProps {
 
 const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, initialData, onSave, onClose }) => {
     const [projectTitle, setProjectTitle] = useState(initialData?.projectTitle || '');
-    const [projectNumber, setProjectNumber] = useState(initialData?.projectNumber || '');
+    const [projectNumber, setProjectNumber] = useState<number>(initialData?.projectNumber ?? 0);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -82,7 +82,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, initialData, onSav
           type="number"
           min={1}
           value={projectNumber}
-          onChange={(e) => setProjectNumber(e.target.value)}
+          onChange={(e) => setProjectNumber(Number(e.target.value))}
           placeholder="Project Number"
           aria-label="Project Number"
           required

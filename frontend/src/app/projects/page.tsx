@@ -7,12 +7,12 @@ import ProjectCard from '@/components/cards/ProjectCard';
 import TaskList from '@/components/TaskLists';
 import ProjectModal from '@/components/ProjectModal';
 import { fetchProjects } from '@/redux/projects/projectsSlice';
-import { RootState, AppDispatch } from '@/app/store'; 
+import { RootState, AppDispatch } from '@/redux/store'
 import { fetchUserInfo } from '@/redux/user/userInfoSlice';
 
 interface Project {
   _id: string;
-  projectNumber: string;
+  projectNumber: number;
   projectTitle: string;
   createdAt?: string | any;
   updatedAt?: string | any;
@@ -48,22 +48,6 @@ const Home =()=> {
     }
   }, [dispatch, userProjects.length]);
 
- 
-
-  /* const fetchProjects = async () => {
-    try {
-      const res = await api.get("/projects");
-      console.log(res);
-      setProjects(res.data);
-      dispatch(setUserProjects(res.data));
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  }; */
-
- /*  useEffect(() => {
-    fetchProjects();
-  }, [dispatch]); */
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % userProjects.length);

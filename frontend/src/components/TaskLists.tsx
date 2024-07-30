@@ -1,11 +1,12 @@
 'use client'
+
 import { useEffect, useState } from 'react';
 import api from '../utils/api';
 import { Box, Button, Heading, Select, useDisclosure } from '@chakra-ui/react';
 import TaskModal from '@/components/TaskModal';
 import { formatDaysLeft } from '@/utils/formatDate';
 import { fetchTasks, addTask, updateTask, deleteTask } from '@/redux/tasks/tasksSlice';
-import { RootState, AppDispatch } from '@/app/store';
+import { RootState, AppDispatch } from '@/redux/store'
 import { useDispatch, useSelector } from 'react-redux';
 
 // Define the props interface
@@ -26,63 +27,64 @@ interface Task {
   // Add any other fields you may have in your task data
 }
 
-const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
-   // console.log(selectedDate)
-   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
-   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-   const [filter, setFilter] = useState<string>('all');
-   const { isOpen, onOpen, onClose } = useDisclosure();
+const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [filter, setFilter] = useState<string>('all');
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-   const dispatch = useDispatch<AppDispatch>();
-   const tasks = useSelector((state: RootState) => state.tasks.tasks);
-   const taskStatus = useSelector((state: RootState) => state.tasks.status);
+  const dispatch = useDispatch<AppDispatch>();
+  const tasks = useSelector((state: RootState) => state.tasks.tasks);
+  const taskStatus = useSelector((state: RootState) => state.tasks.status);
 
-   useEffect(() => {
+  useEffect(() => {
+    // Check if tasks are present for the given projectId
+    const projectTasks = tasks.filter(task => task.projectId === projectId);
+
+    if (projectTasks.length > 0) {
+      // If tasks are present, filter them
+      setFilteredTasks(projectTasks);
+    } else {
+      // If no tasks are present, make an API call
       dispatch(fetchTasks(projectId));
-  }, [projectId]);
+    }
+  }, [projectId, tasks]);
 
   useEffect(() => {
     filterTasks();
   }, [selectedDate, filter, tasks]);
 
-
-
   const filterTasks = () => {
     let filtered = tasks.filter(task => {
+      if (task.projectId !== projectId) return false;
+
       const taskStartDate = new Date(task?.createdAt || '');
       const taskEndDate = new Date(task?.taskEndDate || '');
-      console.log({taskStartDate,selectedDate,taskEndDate})
       return selectedDate && ((selectedDate >= taskStartDate && selectedDate <= taskEndDate) || selectedDate <= taskEndDate);
     });
+
     if (filter !== 'all') {
       filtered = filtered.filter(task => task.taskStatus === filter);
     }
-    console.log({filtered})
+
     setFilteredTasks(filtered);
   };
-
- 
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFilter(event.target.value);
   };
 
   const handleEdit = (task: Task) => {
-   // setSelectedTask(task);
-    console.log(selectedTask)
-    console.log(task)
+    setSelectedTask(task);
     onOpen();
   };
 
   const handleSave = async (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => {
-    console.log("handle save chala Taskslists ka")
     try {
       if (selectedTask) {
-        await dispatch(updateTask({  projectId, _id: selectedTask._id , taskData }));
-        console.log("handle save chala Taskslists ka")
+        await dispatch(updateTask({ projectId, _id: selectedTask._id, taskData }));
       } else {
         await dispatch(addTask({ projectId, taskData }));
-        console.log("handle save chala Taskslists ka")
       }
       dispatch(fetchTasks(projectId));
     } catch (error) {
@@ -93,7 +95,6 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
   };
 
   const handleDelete = async (taskId: string) => {
-    
     try {
       await api.delete(`/projects/${projectId}/tasks/${taskId}`);
       dispatch(deleteTask(taskId));
@@ -102,14 +103,17 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
     }
   };
 
-  console.log({filteredTasks})
-  if(tasks.length==0) return(
-    <Heading display={'flex'} justifyContent={'center'} alignItems={'center'} as={'h3'} >No tasks for this project</Heading>
-  )
+  if (tasks.filter(task => task.projectId === projectId).length === 0) {
+    return (
+      <Heading display={'flex'} justifyContent={'center'} alignItems={'center'} as={'h3'}>
+        No tasks for this project
+      </Heading>
+    );
+  }
 
   return (
-    <div >
-         <Box mb={4}>
+    <div>
+      <Box mb={4}>
         <Select onChange={handleFilterChange} value={filter}>
           <option value="all">All Tasks</option>
           <option value="completed">Completed</option>
@@ -117,16 +121,14 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
         </Select>
       </Box>
       {filteredTasks.map((task) => (
-        <div style={{border:"2px solid black",padding:"12px", gap:"2px"}} key={task?._id}>
+        <div style={{ border: "2px solid black", padding: "12px", gap: "2px" }} key={task?._id}>
           <h1>{task?.taskTitle}</h1>
-         {/*  <h1>{task?.taskId}</h1> */}
           <h1>{task?._id}</h1>
-          hiiii
           <h2>{task?.taskStatus}</h2>
           <p>{task?.taskDescription}</p>
           <p>End Date: {new Date(String(task?.taskEndDate)).toLocaleDateString()}</p>
           <p>{formatDaysLeft(String(task?.taskEndDate))}</p>
-          <Button onClick={() => {setSelectedTask(task); handleEdit(task);}}>Edit task</Button>
+          <Button onClick={() => { setSelectedTask(task); handleEdit(task); }}>Edit task</Button>
           <Button onClick={() => handleDelete(task?._id)}>Delete task</Button>
         </div>
       ))}
@@ -142,7 +144,6 @@ const TaskList = ({ projectId, refreshTasks,selectedDate }: TaskListProps) => {
             taskDescription: selectedTask.taskDescription,
             taskEndDate: String(selectedTask.taskEndDate),
             taskStatus: selectedTask.taskStatus
-            
           }}
           selectedTask={selectedTask}
           onSave={handleSave}

@@ -12,7 +12,7 @@ import CustomToast from '../toast/CustomToast';
 // Correct type definition
 type Project = {
   _id: string;
-  projectNumber: string;
+  projectNumber: number;
   projectTitle: string;
   projectDate?: string;
   createdAt?: string;
