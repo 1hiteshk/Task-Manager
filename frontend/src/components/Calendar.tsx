@@ -33,7 +33,9 @@ const Calendar: React.FC<CalendarProps> = ({ projectId, refreshTasks }) => {
           key={i}
           textAlign="center"
           cursor="pointer"
-          padding="4"
+          padding={{base:2,md:4}}
+          height={{base:'55px',sm:'60px',md:'90px'}}
+          width={{base:'50px',sm:'60px',md:'90px'}}
           bg={isSameDay(day, selectedDate) ? 'blue.500' : ''}
           color={isSameDay(day, selectedDate) ? 'white' : 'black'}
           onClick={() => handleDateClick(day)}

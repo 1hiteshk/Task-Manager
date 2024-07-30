@@ -4,29 +4,34 @@ import api from '@/utils/api';
 import { useDispatch } from 'react-redux';
 import { deleteTask } from '@/redux/tasks/tasksSlice';
 import { useToast } from '@chakra-ui/react';
+import { formatDaysLeft } from '@/utils/formatDate';
 
 type Task = {
-  taskId: string;
+  _id?: string;
   taskTitle: string;
   taskDescription: string;
   taskStatus: string;
   taskEndDate: string;
-  projectId: string;
+  createdAt: string;
+ 
 };
 
 interface TaskCardProps {
-  data: Task;
+  task: Task;
+  projectId: string;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ data }) => {
-  const { taskId, taskTitle, taskDescription, taskStatus, taskEndDate } = data;
+const TaskCard: React.FC<TaskCardProps> = ({ task,projectId,onDelete,onEdit }) => {
+  const { _id, taskTitle, taskDescription, taskStatus, taskEndDate } = task;
   const dispatch = useDispatch();
   const toast = useToast();
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/tasks/${taskId}`);
-      dispatch(deleteTask(taskId));
+      await api.delete(`/tasks/${_id}`);
+      dispatch(deleteTask(_id));
       toast({
         title: 'Task deleted.',
         description: "The task has been deleted.",
@@ -54,10 +59,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ data }) => {
       <CardBody>
         <Text>Description: {taskDescription}</Text>
         <Text>Status: {taskStatus}</Text>
-        <Text>End Date: {taskEndDate}</Text>
+        <Text>{formatDaysLeft(String(taskEndDate))}</Text>
       </CardBody>
       <CardFooter display={'flex'} flexDir={'column'}>
-        <Button mb={4} onClick={handleDelete}>Delete Task</Button>
+      <Button onClick={onEdit} mt={2} colorScheme="blue">Edit Task</Button>
+      <Button onClick={onDelete} mt={2} colorScheme="red">Delete Task</Button>
       </CardFooter>
     </Card>
   );

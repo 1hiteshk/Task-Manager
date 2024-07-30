@@ -3,7 +3,7 @@ import { RiLogoutCircleRLine } from "react-icons/ri";
 import useCookie from "@/hooks/cookie/useCookie";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Box, Flex, Icon, Text } from "@chakra-ui/react";
 import { FaAngleDown } from "react-icons/fa";
 import Image from "next/image";
@@ -28,11 +28,14 @@ const options: Option[] = [
 
 const UserDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn,setIsLoggedIn] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   const { removeCookie, getCookie } = useCookie();
   const userId = useSelector((state: RootState) => state.userDetails);
-  const isLogin = useSelector((state: RootState) => state.user.isLoggedIn) || userId;
-  const isLoggedIn = isUserLoggedIn() ;
+  const pathname = usePathname();
+  /* const isLogin = useSelector((state: RootState) => state.user.isLoggedIn) || userId;
+  const isLoggedIn = isUserLoggedIn() ; */
   console.log({ isLoggedIn });
   // console.log(!isLoggedIn);
   //console.log(!!isLoggedIn);
@@ -40,19 +43,25 @@ const UserDropdown: React.FC = () => {
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState(options[0].name);
 
+  useEffect(() => {
+    setIsLoggedIn(isUserLoggedIn());
+  }, [pathname]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     removeCookie("token");
     dispatch(userLogout());
     dispatch(setUserInfo(null));
-    isUserLoggedIn();
+    setIsLoggedIn(false);
     router.push("/auth");
     console.log("logged out");
   };
 
   const handleClick = () => {
-    if(!isLoggedIn)
+    if(!isLoggedIn){
+     // console.log({isLoggedIn})
       router.push("/auth");
+    }
   };
 
   const handleSelectChange = (opt: string) => {
@@ -103,11 +112,11 @@ const UserDropdown: React.FC = () => {
             width={40}
             height={40}
           />
-          {isLogin && <FaAngleDown />}
+          {isLoggedIn && <FaAngleDown />}
         </Flex>
       </Box>
 
-      {isOpen && isLogin && (
+      {isOpen && isLoggedIn && (
         <Box
           position="absolute"
           top="100%"

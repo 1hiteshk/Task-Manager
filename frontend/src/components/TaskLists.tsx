@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import api from '../utils/api';
-import { Box, Button, Heading, Select, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Heading, Select, Stack, useDisclosure } from '@chakra-ui/react';
 import TaskModal from '@/components/TaskModal';
 import { formatDaysLeft } from '@/utils/formatDate';
 import { fetchTasks, addTask, updateTask, deleteTask } from '@/redux/tasks/tasksSlice';
 import { RootState, AppDispatch } from '@/redux/store'
 import { useDispatch, useSelector } from 'react-redux';
+import TaskFilterButtons from './task/TaskFilterButtons';
+import DeleteTaskModal from './task/DeleteTaskModal';
+import TaskCard from './cards/TaskCard';
 
 // Define the props interface
 interface TaskListProps {
@@ -30,7 +33,8 @@ interface Task {
 const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [filter, setFilter] = useState<string>('all');
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [filter, setFilter] = useState<'all' | 'not completed' | 'completed'>('all');
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const dispatch = useDispatch<AppDispatch>();
@@ -70,8 +74,8 @@ const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
     setFilteredTasks(filtered);
   };
 
-  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilter(event.target.value);
+  const handleFilterChange = (filter: 'all' | 'not completed' | 'completed') => {
+    setFilter(filter);
   };
 
   const handleEdit = (task: Task) => {
@@ -113,15 +117,25 @@ const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
 
   return (
     <div>
+     <Stack gap={4} justifyContent={'center'}>
+     <TaskFilterButtons selectedFilter={filter} onFilterChange={handleFilterChange} />
       <Box mb={4}>
-        <Select onChange={handleFilterChange} value={filter}>
+      <Select onChange={e => handleFilterChange(e.target.value as 'all' | 'not completed' | 'completed')} value={filter}>
           <option value="all">All Tasks</option>
           <option value="completed">Completed</option>
           <option value="not completed">Not Completed</option>
         </Select>
       </Box>
+     </Stack>
       {filteredTasks.map((task) => (
-        <div style={{ border: "2px solid black", padding: "12px", gap: "2px" }} key={task?._id}>
+        <TaskCard
+          key={task._id}
+          task={task}
+          onEdit={() => handleEdit(task)}
+          onDelete={() => setTaskToDelete(task)}
+        />
+      ))}
+       {/* <div style={{ border: "2px solid black", padding: "12px", gap: "2px" }} key={task?._id}>
           <h1>{task?.taskTitle}</h1>
           <h1>{task?._id}</h1>
           <h2>{task?.taskStatus}</h2>
@@ -130,8 +144,7 @@ const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
           <p>{formatDaysLeft(String(task?.taskEndDate))}</p>
           <Button onClick={() => { setSelectedTask(task); handleEdit(task); }}>Edit task</Button>
           <Button onClick={() => handleDelete(task?._id)}>Delete task</Button>
-        </div>
-      ))}
+        </div> */}
 
       {selectedTask && (
         <TaskModal
@@ -147,6 +160,18 @@ const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
           }}
           selectedTask={selectedTask}
           onSave={handleSave}
+        />
+      )}
+       {taskToDelete && (
+        <DeleteTaskModal
+          isOpen={!!taskToDelete}
+          task={taskToDelete}
+          projectId={projectId}
+          onClose={() => setTaskToDelete(null)}
+          onConfirm={() => {
+            setTaskToDelete(null);
+            dispatch(fetchTasks(projectId));
+          }}
         />
       )}
     </div>
