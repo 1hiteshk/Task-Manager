@@ -16,16 +16,28 @@ const createTask = async(req,res) => {
 }
 
 // get all tasks of a project by projectId
-const getTasks = async(req,res) => {
-    // Check if the project exists
-  const project = await Project.findById(req.params.projectId);
-  if (!project) {
-    return res.status(404).json({ message: 'Project not found' });
-  }
-
-    const tasks = await Task.find({projectId: req.params.projectId});
-    res.status(200).json(tasks);
-}
+const getTasks = async (req, res) => {
+    try {
+      // Check if the project exists
+      const project = await Project.findById(req.params.projectId);
+      if (!project) {
+        return res.status(404).json({ message: 'Project not found' });
+      }
+  
+      // Fetch the tasks for the given project
+      const tasks = await Task.find({ projectId: req.params.projectId });
+  
+      // Check if tasks exist
+      if (tasks.length === 0) {
+        return res.status(404).json({ message: 'No tasks for this project' });
+      }
+  
+      res.status(200).json(tasks);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
 
 // get a single task by taskId
 const getTask = async(req,res) => {
