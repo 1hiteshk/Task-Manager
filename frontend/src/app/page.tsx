@@ -11,15 +11,12 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    
-      router.push("/projects");
-    
+    router.push("/projects");
   }, [router]);
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+  return null;
+   {/* <main className="flex min-h-screen flex-col items-center justify-between p-24">
       {isLoggedIn ? "Logged in" : "Not logged in"} hello
       <CounterComponent />
-    </main>
-  );
+    </main> */}
 }

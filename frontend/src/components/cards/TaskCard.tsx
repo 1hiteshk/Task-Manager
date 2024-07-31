@@ -11,45 +11,20 @@ type Task = {
   taskTitle: string;
   taskDescription: string;
   taskStatus: string;
-  taskEndDate: string;
-  createdAt: string;
+  taskEndDate?: string;
+  createdAt?: string | any;
  
 };
 
 interface TaskCardProps {
   task: Task;
-  projectId: string;
+  projectId?: string;
   onEdit: () => void;
   onDelete: () => void;
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task,projectId,onDelete,onEdit }) => {
   const { _id, taskTitle, taskDescription, taskStatus, taskEndDate } = task;
-  const dispatch = useDispatch();
-  const toast = useToast();
-
-  const handleDelete = async () => {
-    try {
-      await api.delete(`/tasks/${_id}`);
-      dispatch(deleteTask(_id));
-      toast({
-        title: 'Task deleted.',
-        description: "The task has been deleted.",
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch (error) {
-      console.error("Error deleting task:", error);
-      toast({
-        title: 'Error deleting task.',
-        description: "There was an error deleting the task.",
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
 
   return (
     <Card variant={'filled'} border={'2px solid black'}>

@@ -10,10 +10,9 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import api from "@/utils/api";
 import ProjectCard from "@/components/cards/ProjectCard";
-import TaskList from "@/components/TaskLists";
-import ProjectModal from "@/components/ProjectModal";
+import TaskList from "@/components/task/TaskLists"; 
+import ProjectModal from "@/components/project/ProjectModal";
 import { fetchProjects } from "@/redux/projects/projectsSlice";
 import { RootState, AppDispatch } from "@/redux/store";
 import { fetchUserInfo } from "@/redux/user/userInfoSlice";
@@ -30,7 +29,6 @@ interface Project {
 }
 
 const Home = () => {
-  // const [projects, setProjects] = useState<Project[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [refreshTasks, setRefreshTasks] = useState<boolean>(false);
@@ -45,16 +43,14 @@ const Home = () => {
   const currentDate = new Date();
   const router = useRouter();
 
-  /* const {
+  const {
     status,
-    projects: userProjects,
     error
-  } = useSelector( (state: RootState) => state.projects ); */
+  } = useSelector( (state: RootState) => state.projects );
   const userProjects = useSelector(
     (state: RootState) => state.projects.projects
   );
-  const status = useSelector((state: RootState) => state.projects.status);
-  const error = useSelector((state: RootState) => state.projects.error);
+  
 
   // Fetch user details if not already in the store
   useEffect(() => {
@@ -66,7 +62,7 @@ const Home = () => {
   useEffect(() => {
     // If user is not logged in then redirect to login screen
     if (!isUserLoggedIn()) {
-      router.push("/auth");
+      router.push("/login");
     }
   }, []);
 
@@ -101,6 +97,7 @@ const Home = () => {
   };
 
   const handleAddProject = () => {
+    setIsEditProject(false)
     setSelectedProject(null);
     onOpen();
   };
@@ -115,20 +112,20 @@ const Home = () => {
 
   const getMainContentUI = () => {
     if (status === API_STATUS.LOADING) {
-      return <div>Loading...</div>;
+      return <Flex p={4} >Loading...</Flex>;
     }
 
     if (error) {
       // Error while fetching the projects
-      return <div>Show error state</div>;
+      return <Flex p={4}>Show error state</Flex>;
     }
 
     if (isEmpty(userProjects)) {
       // Here create the empty state for no projects found
       return (
-        <Stack>
+        <Stack p={4} gap={4} height={'100vh'}>
           <Heading>No projects found</Heading>
-          <Button onClick={handleAddProject}>Create a new project</Button>
+          <Button colorScheme="blue" onClick={handleAddProject}>Create a new project</Button>
         </Stack>
       );
     }
@@ -195,12 +192,12 @@ const Home = () => {
       <ProjectModal
         isOpen={isOpen}
         onClose={onClose}
-        projectId={selectedProject?._id}
+        projectId={isEditProject? selectedProjectFromIndex?._id :''}
         initialData={
-          selectedProject && isEditProject
+          selectedProjectFromIndex && isEditProject
             ? {
-                projectTitle: selectedProject.projectTitle,
-                projectNumber: selectedProject.projectNumber,
+                projectTitle: selectedProjectFromIndex.projectTitle,
+                projectNumber: selectedProjectFromIndex.projectNumber,
               }
             : undefined
         }

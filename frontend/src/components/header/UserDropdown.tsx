@@ -53,14 +53,14 @@ const UserDropdown: React.FC = () => {
     dispatch(userLogout());
     dispatch(setUserInfo(null));
     setIsLoggedIn(false);
-    router.push("/auth");
+    router.push("/login");
     console.log("logged out");
   };
 
   const handleClick = () => {
     if(!isLoggedIn){
      // console.log({isLoggedIn})
-      router.push("/auth");
+      router.push("/login");
     }
   };
 

@@ -25,9 +25,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ projectId, initialData, onSav
     const [projectNumber, setProjectNumber] = useState<number>(initialData?.projectNumber ?? 0);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  /* console.log({initialData});
-  console.log({projectTitle});
-  console.log({projectNumber}); */
 
   // Access user details from Redux store
   const userDetails = useSelector((state: RootState) => state.userDetails);

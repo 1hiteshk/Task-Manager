@@ -14,16 +14,12 @@ import {
   Stack,
   FormControl,
   FormErrorMessage,
+  Spinner,
+  Text,
 } from "@chakra-ui/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { isUserLoggedIn } from "@/utils/helpers";
-import { fetchUserInfo } from "@/redux/user/userInfoSlice";
-
-interface FormData {
-  username: string;
-  email: string;
-  password: string;
-}
+import { isUserLoggedIn , validateEmail} from "@/utils/helpers";
+import { FormData } from "@/utils/type";
 
 const SignUpForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -33,15 +29,14 @@ const SignUpForm: React.FC = () => {
   });
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [authError, setAuthError] = useState<string | null>(null); // State variable for auth error
+  const [show, setShow] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { setAuthCookie } = useCookie();
-  const [show, setShow] = useState(false);
+ 
 
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  
 
   const validate = (name: keyof FormData, value: string): Partial<FormData> => {
     const newErrors: Partial<FormData> = {};
@@ -85,25 +80,33 @@ const SignUpForm: React.FC = () => {
     const emailErrors = validate("email", formData.email);
     const passwordErrors = validate("password", formData.password);
 
-    if (Object.keys(usernameErrors).length > 0 || Object.keys(emailErrors).length > 0 || Object.keys(passwordErrors).length > 0) {
+    if (
+      Object.keys(usernameErrors).length > 0 ||
+      Object.keys(emailErrors).length > 0 ||
+      Object.keys(passwordErrors).length > 0
+    ) {
       setErrors({ ...usernameErrors, ...emailErrors, ...passwordErrors });
       return;
     }
-
+    setIsLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/users/signup", formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/users/signup",
+        formData
+      );
       localStorage.setItem("token", response.data.token);
       setAuthCookie("token", response.data.token);
       dispatch(user());
-    //  dispatch(fetchUserInfo());
       isUserLoggedIn();
       router.push("/projects");
     } catch (error: any) {
-      if (error.response && error.response.status === 401) {
+      if (error.response && error.response.status === 400) {
         setAuthError(error.response.data.message);
       } else {
         console.error("Sign up failed:", error);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -128,13 +131,16 @@ const SignUpForm: React.FC = () => {
             width={{ lg: "500px", sm: "250px" }}
             borderRadius={"6px"}
             borderWidth={"1px"}
+            borderColor={"gray.500"}
             padding={"15px 20px"}
             gap={"10px"}
           />
-          {errors.username && <FormErrorMessage>{errors.username}</FormErrorMessage>}
+          {errors.username && (
+            <FormErrorMessage>{errors.username}</FormErrorMessage>
+          )}
         </FormControl>
-        
-        <FormControl isInvalid={!!errors.email}>
+
+        <FormControl isInvalid={!!errors.email || !!authError}>
           <Input
             type="email"
             name="email"
@@ -144,13 +150,15 @@ const SignUpForm: React.FC = () => {
             width={{ lg: "500px", sm: "250px" }}
             borderRadius={"6px"}
             borderWidth={"1px"}
+            borderColor={"gray.500"}
             padding={"15px 20px"}
             gap={"10px"}
           />
           {errors.email && <FormErrorMessage>{errors.email}</FormErrorMessage>}
+          {authError && <FormErrorMessage>{authError}</FormErrorMessage>}
         </FormControl>
 
-        <FormControl isInvalid={!!errors.password || !!authError}>
+        <FormControl isInvalid={!!errors.password}>
           <InputGroup>
             <Input
               type={show ? "text" : "password"}
@@ -161,23 +169,40 @@ const SignUpForm: React.FC = () => {
               width={{ lg: "500px", sm: "250px" }}
               borderRadius={"6px"}
               borderWidth={"1px"}
+              borderColor={"gray.500"}
               padding={"15px 20px"}
               gap={"10px"}
             />
             <InputRightElement width={"4.5rem"}>
               <IconButton
                 aria-label={show ? "Hide password" : "Show password"}
-                icon={show ? <FaEyeSlash /> : <FaEye />}
+                icon={
+                  show ? (
+                    <FaEyeSlash color="gray.500" />
+                  ) : (
+                    <FaEye color="gray.500" />
+                  )
+                }
                 onClick={() => setShow(!show)}
                 variant="ghost"
               />
             </InputRightElement>
           </InputGroup>
-          {errors.password && <FormErrorMessage>{errors.password}</FormErrorMessage>}
-          {authError && <FormErrorMessage>{authError}</FormErrorMessage>}
+          {errors.password && (
+            <FormErrorMessage>{errors.password}</FormErrorMessage>
+          )}
         </FormControl>
 
-        <Button type="submit">Sign up</Button>
+        <Button
+          type="submit"
+          borderRadius="6px"
+          padding="10px 80px"
+          disabled={isLoading}
+          colorScheme="blue"
+        >
+          {isLoading && <Spinner mr="10px" size="sm" />}
+          <Text>Login</Text>
+        </Button>
       </form>
     </Stack>
   );

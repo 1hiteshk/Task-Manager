@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,7 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { isUserLoggedIn } from "@/utils/helpers";
+import { isUserLoggedIn, validateEmail } from "@/utils/helpers";
 import { fetchUserInfo } from "@/redux/user/userInfoSlice";
 
 interface FormData {
@@ -28,19 +28,17 @@ interface FormData {
 }
 
 const LoginForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    password: "",
+  });
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [authError, setAuthError] = useState<string | null>(null); // New state variable for auth error
+  const [show, setShow] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { setAuthCookie } = useCookie();
-  const [show, setShow] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
   const validate = (name: keyof FormData, value: string): Partial<FormData> => {
     const newErrors: Partial<FormData> = {};
@@ -80,14 +78,20 @@ const LoginForm: React.FC = () => {
     const emailErrors = validate("email", formData.email);
     const passwordErrors = validate("password", formData.password);
 
-    if (Object.keys(emailErrors).length > 0 || Object.keys(passwordErrors).length > 0) {
+    if (
+      Object.keys(emailErrors).length > 0 ||
+      Object.keys(passwordErrors).length > 0
+    ) {
       setErrors({ ...emailErrors, ...passwordErrors });
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/users/login", formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/users/login",
+        formData
+      );
       localStorage.setItem("token", response.data.token);
       setAuthCookie("token", response.data.token);
       isUserLoggedIn();
@@ -108,7 +112,12 @@ const LoginForm: React.FC = () => {
   return (
     <Stack gap="20px" mt="20px">
       <form
-        style={{ gap: "20px", marginTop: "20px", display: "flex", flexDirection: "column" }}
+        style={{
+          gap: "20px",
+          marginTop: "20px",
+          display: "flex",
+          flexDirection: "column",
+        }}
         onSubmit={handleSubmit}
       >
         <FormControl isInvalid={!!errors.email}>
@@ -121,6 +130,7 @@ const LoginForm: React.FC = () => {
             width={{ lg: "500px", sm: "250px" }}
             borderRadius="6px"
             borderWidth="1px"
+            borderColor={"gray.500"}
             padding="15px 20px"
             gap="10px"
           />
@@ -138,19 +148,28 @@ const LoginForm: React.FC = () => {
               width={{ lg: "500px", sm: "250px" }}
               borderRadius="6px"
               borderWidth="1px"
+              borderColor={"gray.500"}
               padding="15px 20px"
               gap="10px"
             />
             <InputRightElement width="4.5rem">
               <IconButton
                 aria-label={show ? "Hide password" : "Show password"}
-                icon={show ? <FaEyeSlash /> : <FaEye />}
+                icon={
+                  show ? (
+                    <FaEyeSlash color="gray.500" />
+                  ) : (
+                    <FaEye color="gray.500" />
+                  )
+                }
                 onClick={() => setShow(!show)}
                 variant="ghost"
               />
             </InputRightElement>
           </InputGroup>
-          {errors.password && <FormErrorMessage>{errors.password}</FormErrorMessage>}
+          {errors.password && (
+            <FormErrorMessage>{errors.password}</FormErrorMessage>
+          )}
           {authError && <FormErrorMessage>{authError}</FormErrorMessage>}
         </FormControl>
 
@@ -159,6 +178,7 @@ const LoginForm: React.FC = () => {
           borderRadius="6px"
           padding="10px 80px"
           disabled={isLoading}
+          colorScheme="blue"
         >
           {isLoading && <Spinner mr="10px" size="sm" />}
           <Text>Login</Text>
