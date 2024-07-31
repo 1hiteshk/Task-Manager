@@ -91,7 +91,7 @@ const SignUpForm: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/users/signup",
+    `https://task-manager-git-master-hitesh-kumars-projects.vercel.app/api/users/signup`,
         formData
       );
       localStorage.setItem("token", response.data.token);
@@ -201,7 +201,7 @@ const SignUpForm: React.FC = () => {
           colorScheme="blue"
         >
           {isLoading && <Spinner mr="10px" size="sm" />}
-          <Text>Login</Text>
+          <Text>Sign up</Text>
         </Button>
       </form>
     </Stack>
