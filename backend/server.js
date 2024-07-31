@@ -11,10 +11,10 @@ connectDB();
 const app = express();
 
 const allowedOrigins = [
-  'https://task-manager-git-master-hitesh-kumars-projects.vercel.app',
-  'https://task-manager-three-rho.vercel.app',
-  'https://task-manager-27e9p61hv-hitesh-kumars-projects.vercel.app',
-  'http://localhost:3000'
+    process.env.API_URL1,
+    process.env.API_URL2,
+    process.env.API_URL3,
+    process.env.API_URL4
 ];
 
 app.use(cors({

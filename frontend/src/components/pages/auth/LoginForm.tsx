@@ -39,7 +39,7 @@ const LoginForm: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { setAuthCookie } = useCookie();
-  const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL
+  const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/users/login` || `https://task-manager-backend-pug2.onrender.com/api/users/login`
 
   const validate = (name: keyof FormData, value: string): Partial<FormData> => {
     const newErrors: Partial<FormData> = {};
@@ -89,7 +89,7 @@ const LoginForm: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "https://task-manager-backend-pug2.onrender.com/api/users/login",
+        API_URL,
         formData
       );
       localStorage.setItem("token", response.data.token);
