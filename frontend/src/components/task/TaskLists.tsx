@@ -139,7 +139,7 @@ const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
   }
 
   return (
-    <div>
+    <Box>
       <Stack gap={4} justifyContent={"center"}>
         <TaskFilterButtons
           selectedFilter={filter}
@@ -160,6 +160,7 @@ const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
           </Select>
         </Box>
       </Stack>
+      <Box  display={'flex'} flexDirection={'column'} gap={2} >
       {filteredTasks.map((task) => (
         <TaskCard
           key={task._id}
@@ -168,6 +169,7 @@ const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
           onDelete={() => setTaskToDelete(task)}
         />
       ))}
+      </Box>
 
       {selectedTask && (
         <TaskModal
@@ -197,7 +199,7 @@ const TaskList = ({ projectId, refreshTasks, selectedDate }: TaskListProps) => {
           }}
         />
       )}
-    </div>
+    </Box>
   );
 };
 

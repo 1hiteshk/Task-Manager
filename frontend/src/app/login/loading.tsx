@@ -1,4 +1,4 @@
-
+'use client'
 import React from 'react';
 import { Box, Skeleton, SkeletonCircle, useBreakpointValue } from '@chakra-ui/react';
 import type { Metadata } from 'next';

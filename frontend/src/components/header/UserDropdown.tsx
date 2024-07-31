@@ -34,11 +34,6 @@ const UserDropdown: React.FC = () => {
   const { removeCookie, getCookie } = useCookie();
   const userId = useSelector((state: RootState) => state.userDetails);
   const pathname = usePathname();
-  /* const isLogin = useSelector((state: RootState) => state.user.isLoggedIn) || userId;
-  const isLoggedIn = isUserLoggedIn() ; */
-  console.log({ isLoggedIn });
-  // console.log(!isLoggedIn);
-  //console.log(!!isLoggedIn);
   const dispatch = useDispatch();
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState(options[0].name);

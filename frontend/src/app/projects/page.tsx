@@ -1,6 +1,7 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Box,
   Button,
@@ -9,16 +10,16 @@ import {
   Stack,
   Text,
   useDisclosure,
-} from "@chakra-ui/react";
-import ProjectCard from "@/components/cards/ProjectCard";
-import TaskList from "@/components/task/TaskLists"; 
-import ProjectModal from "@/components/project/ProjectModal";
-import { fetchProjects } from "@/redux/projects/projectsSlice";
-import { RootState, AppDispatch } from "@/redux/store";
-import { fetchUserInfo } from "@/redux/user/userInfoSlice";
-import { isEmpty, isUserLoggedIn } from "@/utils/helpers";
-import { useRouter } from "next/navigation";
-import { API_STATUS } from "@/config/constantMaps";
+} from '@chakra-ui/react';
+import ProjectCard from '@/components/cards/ProjectCard';
+import TaskList from '@/components/task/TaskLists';
+import ProjectModal from '@/components/project/ProjectModal';
+import { fetchProjects } from '@/redux/projects/projectsSlice';
+import { RootState, AppDispatch } from '@/redux/store';
+import { fetchUserInfo } from '@/redux/user/userInfoSlice';
+import { isEmpty, isUserLoggedIn } from '@/utils/helpers';
+import { useRouter } from 'next/navigation';
+import { API_STATUS } from '@/config/constantMaps';
 
 interface Project {
   _id: string;
@@ -34,60 +35,38 @@ const Home = () => {
   const [refreshTasks, setRefreshTasks] = useState<boolean>(false);
   const [isEditProject, setIsEditProject] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
-  const userProject = useSelector(
-    (state: RootState) => state.projects.projects
-  );
-  // Access user details from Redux store
+  const userProjects = useSelector((state: RootState) => state.projects.projects);
   const userDetails = useSelector((state: RootState) => state.userDetails);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const currentDate = new Date();
   const router = useRouter();
 
-  const {
-    status,
-    error
-  } = useSelector( (state: RootState) => state.projects );
-  const userProjects = useSelector(
-    (state: RootState) => state.projects.projects
-  );
-  
+  const { status, error } = useSelector((state: RootState) => state.projects);
 
-  // Fetch user details if not already in the store
   useEffect(() => {
     if (!userDetails.username) {
       dispatch(fetchUserInfo());
     }
-  }, []);
+  }, [dispatch, userDetails.username]);
 
   useEffect(() => {
-    // If user is not logged in then redirect to login screen
     if (!isUserLoggedIn()) {
-      router.push("/login");
+      router.push('/login');
     }
-  }, []);
-
-  console.log(userProjects[1]?._id, "userProjects");
+  }, [router]);
 
   useEffect(() => {
-    if (userProject.length === 0) {
+    if (userProjects.length === 0) {
       dispatch(fetchProjects());
     }
-  }, [dispatch, userProject.length]);
-
-  /*  useEffect(() => {
-    if (isEmpty(userProjects)) {
-      dispatch(fetchProjects());
-    }
-  }, []); */
+  }, [dispatch, userProjects.length]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % userProjects.length);
   };
 
   const handlePrev = () => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + userProjects.length) % userProjects.length
-    );
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + userProjects.length) % userProjects.length);
   };
 
   const handleSave = () => {
@@ -97,7 +76,7 @@ const Home = () => {
   };
 
   const handleAddProject = () => {
-    setIsEditProject(false)
+    setIsEditProject(false);
     setSelectedProject(null);
     onOpen();
   };
@@ -108,24 +87,24 @@ const Home = () => {
     onOpen();
   };
 
-  const selectedProjectFromIndex = userProject[currentIndex];
+  const selectedProjectFromIndex = userProjects[currentIndex];
 
   const getMainContentUI = () => {
     if (status === API_STATUS.LOADING) {
-      return <Flex p={4} >Loading...</Flex>;
+      return <Flex p={4}>Loading...</Flex>;
     }
 
     if (error) {
-      // Error while fetching the projects
       return <Flex p={4}>Show error state</Flex>;
     }
 
     if (isEmpty(userProjects)) {
-      // Here create the empty state for no projects found
       return (
-        <Stack p={4} gap={4} height={'100vh'}>
+        <Stack p={4} gap={4} height="100vh">
           <Heading>No projects found</Heading>
-          <Button colorScheme="blue" onClick={handleAddProject}>Create a new project</Button>
+          <Button colorScheme="blue" onClick={handleAddProject}>
+            Create a new project
+          </Button>
         </Stack>
       );
     }
@@ -133,41 +112,28 @@ const Home = () => {
     return (
       <>
         <Flex justify="center" align="center" mt={4}>
-          <Flex alignItems={"center"}>
+          <Flex alignItems="center">
             <Button onClick={handlePrev}>&lt;</Button>
             <Box mx={4}>
               {selectedProjectFromIndex && (
-                <ProjectCard
-                  key={selectedProjectFromIndex?._id}
-                  data={selectedProjectFromIndex}
-                />
+                <ProjectCard key={selectedProjectFromIndex._id} data={selectedProjectFromIndex} />
               )}
             </Box>
             <Button onClick={handleNext}>&gt;</Button>
           </Flex>
         </Flex>
-        <Flex justifyContent={"space-around"} alignItems={"center"}>
-          <Button
-            bgColor="#4841e5"
-            color={"#fff"}
-            onClick={handleAddProject}
-            mt={4}
-          >
+        <Flex justifyContent="space-around" alignItems="center">
+          <Button bgColor="#4841e5" color="#fff" onClick={handleAddProject} mt={4}>
             Add Project
           </Button>
-          <Button
-            bgColor={"#4d44f8"}
-            color={"#fff"}
-            onClick={handleEditProject}
-            mt={4}
-          >
+          <Button bgColor="#4d44f8" color="#fff" onClick={handleEditProject} mt={4}>
             Edit Project
           </Button>
         </Flex>
-        <Heading as="h2" mt={8} display={"flex"} justifyContent={"center"}>
+        <Heading as="h2" mt={8} display="flex" justifyContent="center">
           {selectedProjectFromIndex
-            ? `Tasks of ${selectedProjectFromIndex?.projectTitle}`
-            : ` No Tasks are there for any Project`}
+            ? `Tasks of ${selectedProjectFromIndex.projectTitle}`
+            : 'No Tasks are there for any Project'}
         </Heading>
         {selectedProjectFromIndex?._id && (
           <TaskList
@@ -183,8 +149,8 @@ const Home = () => {
   if (!isUserLoggedIn()) return null;
 
   return (
-    <Box bgColor={"#f2f5ff"} p={{ base: "20px", md: "20px 40px" }}>
-      <Heading color={"#2E3A59"} as="h1">
+    <Box bgColor="#f2f5ff" p={{ base: '20px', md: '20px 40px' }}>
+      <Heading color="#2E3A59" as="h1">
         Hello, {userDetails?.username}!
       </Heading>
       <Text>Have a nice day</Text>
@@ -192,7 +158,7 @@ const Home = () => {
       <ProjectModal
         isOpen={isOpen}
         onClose={onClose}
-        projectId={isEditProject? selectedProjectFromIndex?._id :''}
+        projectId={isEditProject ? selectedProjectFromIndex?._id : ''}
         initialData={
           selectedProjectFromIndex && isEditProject
             ? {
