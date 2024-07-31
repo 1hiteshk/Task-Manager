@@ -1,7 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { Button, FormControl, FormLabel, Input, Textarea, Select } from '@chakra-ui/react';
-import api from '../utils/api';
 import { addTask, fetchTasks, updateTask } from '@/redux/tasks/tasksSlice';
 import { AppDispatch } from '@/redux/store'
 import { useDispatch } from 'react-redux';
