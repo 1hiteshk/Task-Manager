@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import userProfile from '@/hooks/userProfile';
 
-interface UserState {
+export interface UserState {
   email: string;
   id: string;
   username: string;

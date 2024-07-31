@@ -79,12 +79,9 @@ const ProjectDetails = () => {
 
   return (
     <Box
-      borderWidth="1px"
-      borderRadius="lg"
       p={6}
       mb={4}
       bg="white"
-      boxShadow="lg"
     >
       <Flex justifyContent={"space-between"}>
         <ProjectCardDetails project={projectDetails} />

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '@/utils/api';
 
-interface Project {
+export interface Project {
   _id: string;
   projectNumber: number;
   projectTitle: string;

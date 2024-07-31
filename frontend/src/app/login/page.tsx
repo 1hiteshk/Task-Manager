@@ -6,7 +6,7 @@ import React, { useState } from "react";
 
 type Props = {};
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const [isLoginMode, setIsLoginMode] = useState<boolean>(false);
   return (
     <Box
@@ -53,4 +53,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;
