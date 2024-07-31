@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://task-manager-backend-pug2.onrender.com/api',
 });
 
 // Add a request interceptor to add the token to the headers

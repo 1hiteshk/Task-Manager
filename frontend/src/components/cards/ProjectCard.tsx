@@ -71,8 +71,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {
           </Flex>
         </Box>
          <Flex flexDirection={'column'} gap={{base:'20px',sm:'30px',md:'50px'}} justifyContent={'space-between'}>
-         <Text textAlign={'center'} fontSize={{base:'20px',sm:'24px',lg:'32px'}} fontWeight={700}>{projectTitle}</Text>
-         <Text textAlign={'center'} fontSize={{base:'16px',sm:'20px',lg:'28px'}}>Created at: {formatCreatedAt(String(createdAt))}</Text>
+         <Text textAlign={'center'} fontSize={{base:'20px',md:'22px',lg:'32px'}} fontWeight={700}>{projectTitle}</Text>
+         <Text textAlign={'center'} fontSize={{base:'20px',md:'22px',lg:'32px'}}>Created at: {formatCreatedAt(String(createdAt))}</Text>
          </Flex>
       </Link>
     </Stack>
