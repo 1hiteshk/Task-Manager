@@ -15,8 +15,5 @@ export default function Home() {
   }, [router]);
 
   return null;
-   {/* <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {isLoggedIn ? "Logged in" : "Not logged in"} hello
-      <CounterComponent />
-    </main> */}
+   
 }

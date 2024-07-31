@@ -10,7 +10,7 @@ const Loading = () => {
   return (
     <Box padding="6" boxShadow="lg" bg="white" width={skeletonWidth}>
       <Skeleton height="50px" mb="4" width="50%" />
-      <SkeletonCircle size="50" mb="4" />
+      <SkeletonCircle display={'flex'} justifyContent={'flex-end'} size="50" mb="4" />
       <Skeleton height={skeletonHeight} mb="4" />
       <Skeleton height="20px" mb="2" />
       <Skeleton height="20px" mb="2" />

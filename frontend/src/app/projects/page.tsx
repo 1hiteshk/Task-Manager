@@ -34,6 +34,7 @@ const Home = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [refreshTasks, setRefreshTasks] = useState<boolean>(false);
   const [isEditProject, setIsEditProject] = useState<boolean>(false);
+  const [isMounted, setIsMounted] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const userProjects = useSelector((state: RootState) => state.projects.projects);
   const userDetails = useSelector((state: RootState) => state.userDetails);
@@ -44,22 +45,22 @@ const Home = () => {
   const { status, error } = useSelector((state: RootState) => state.projects);
 
   useEffect(() => {
-    if (!userDetails.username) {
-      dispatch(fetchUserInfo());
-    }
-  }, [dispatch, userDetails.username]);
+    const initialize = async () => {
+      setIsMounted(true);
+      if (!isUserLoggedIn()) {
+        router.push('/login');
+        return;
+      }
+      if (!userDetails.username) {
+        await dispatch(fetchUserInfo());
+      }
+      if (userProjects.length === 0) {
+        await dispatch(fetchProjects());
+      }
+    };
 
-  useEffect(() => {
-    if (!isUserLoggedIn()) {
-      router.push('/login');
-    }
-  }, [router]);
-
-  useEffect(() => {
-    if (userProjects.length === 0) {
-      dispatch(fetchProjects());
-    }
-  }, [dispatch, userProjects.length]);
+    initialize();
+  }, [dispatch, router, userDetails.username, userProjects.length]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % userProjects.length);
@@ -146,7 +147,7 @@ const Home = () => {
     );
   };
 
-  if (!isUserLoggedIn()) return null;
+  if (!isMounted) return null;
 
   return (
     <Box bgColor="#f2f5ff" p={{ base: '20px', md: '20px 40px' }}>
