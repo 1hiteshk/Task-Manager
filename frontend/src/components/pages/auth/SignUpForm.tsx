@@ -91,7 +91,7 @@ const SignUpForm: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-    `https://task-manager-git-master-hitesh-kumars-projects.vercel.app/api/users/signup`,
+    `https://task-manager-backend-pug2.onrender.com/api/users/signup`,
         formData
       );
       localStorage.setItem("token", response.data.token);
