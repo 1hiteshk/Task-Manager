@@ -173,16 +173,15 @@ const LoginForm: React.FC = () => {
           {authError && <FormErrorMessage>{authError}</FormErrorMessage>}
         </FormControl>
 
-        <Button
+        <button
           type="submit"
-          borderRadius="6px"
-          padding="10px 80px"
+          style={{borderRadius:'6px',padding:'10px 80px',backgroundColor:'#3182ce',color:'white',textAlign:'center'}}
+          
           disabled={isLoading}
-          colorScheme="blue"
         >
           {isLoading && <Spinner mr="10px" size="sm" />}
-          <Text>Login</Text>
-        </Button>
+          <p>Login</p>
+        </button>
       </form>
     </Stack>
   );
