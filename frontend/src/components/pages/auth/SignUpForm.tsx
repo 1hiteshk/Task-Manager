@@ -20,6 +20,7 @@ import {
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { isUserLoggedIn , validateEmail} from "@/utils/helpers";
 import { FormData } from "@/utils/type";
+import { API_URL_SIGNUP } from "@/config/constantMaps";
 
 const SignUpForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -34,7 +35,6 @@ const SignUpForm: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { setAuthCookie } = useCookie();
-  const API_URL = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/users/signup` || `https://task-manager-backend-pug2.onrender.com/api/users/signup`
  
   const validate = (name: keyof FormData, value: string): Partial<FormData> => {
     const newErrors: Partial<FormData> = {};
@@ -89,7 +89,7 @@ const SignUpForm: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        API_URL,
+        API_URL_SIGNUP,
         formData
       );
       localStorage.setItem("token", response.data.token);
