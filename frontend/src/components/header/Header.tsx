@@ -1,5 +1,4 @@
 'use client';
-
 import { Flex } from '@chakra-ui/react';
 import Image from 'next/image';
 import UserDropdown from './UserDropdown';

@@ -1,9 +1,6 @@
-
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { FormControl, FormLabel, Input, Button } from '@chakra-ui/react';
-import api from '@/utils/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProject, addUserProject, fetchProjects, updateProject, updateUserProject } from '@/redux/projects/projectsSlice';
 import { fetchUserInfo } from '@/redux/user/userInfoSlice';

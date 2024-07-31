@@ -40,16 +40,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId,selectedTask,_id, initial
 
  
   const handleSave = async (taskData: { taskTitle: string; taskDescription: string; taskStatus: string; taskEndDate: string }) => {
-    console.log("handle save chala Taskslists ka")
     try {
       if (_id) {
         console.log({selectedTask})
         console.log(_id)
         await dispatch(updateTask({  projectId, _id: selectedTask._id , taskData }));
-        console.log("handle save chala Taskslists ka")
+        
       } else {
         await dispatch(addTask({ projectId, taskData }));
-        console.log("handle save chala Taskslists ka")
+        
       }
       dispatch(fetchTasks(projectId));
     } catch (error) {
@@ -63,7 +62,6 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId,selectedTask,_id, initial
     e.preventDefault();
    // const taskData = { projectId, taskTitle, taskDescription,taskEndDate, taskStatus };
    
-    console.log("handle submit chala task form ka")
     setIsLoading(true);
     const taskData = { taskTitle, taskDescription, taskStatus, taskEndDate };
     handleSave(taskData)
@@ -71,7 +69,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ projectId,selectedTask,_id, initial
 
     setIsLoading(false);
   
-    console.log("Task saved successfully");
+   // console.log("Task saved successfully");
   };
 
 

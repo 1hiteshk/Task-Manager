@@ -9,7 +9,6 @@ type Task = {
   taskStatus: string;
   taskEndDate?: string;
   createdAt?: string | any;
- 
 };
 
 interface TaskCardProps {

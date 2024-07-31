@@ -39,6 +39,7 @@ const LoginForm: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { setAuthCookie } = useCookie();
+  const API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL
 
   const validate = (name: keyof FormData, value: string): Partial<FormData> => {
     const newErrors: Partial<FormData> = {};
@@ -56,7 +57,6 @@ const LoginForm: React.FC = () => {
         newErrors.password = "Please enter your password";
       }
     }
-
     return newErrors;
   };
 
@@ -175,12 +175,12 @@ const LoginForm: React.FC = () => {
 
         <button
           type="submit"
-          style={{borderRadius:'6px',padding:'10px 80px',backgroundColor:'#3182ce',color:'white',textAlign:'center'}}
+          style={{borderRadius:'6px',padding:'10px 80px',backgroundColor:'#3182ce',color:'white',textAlign:'center',display:'flex',justifyContent:'center'}}
           
           disabled={isLoading}
         >
           {isLoading && <Spinner mr="10px" size="sm" />}
-          <p>Login</p>
+          <p style={{textAlign:'center'}}>Login</p>
         </button>
       </form>
     </Stack>

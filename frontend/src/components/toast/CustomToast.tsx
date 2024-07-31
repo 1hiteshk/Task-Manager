@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import { Box, Progress, UseToastOptions, CloseButton } from '@chakra-ui/react';
 

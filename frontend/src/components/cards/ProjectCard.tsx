@@ -1,9 +1,4 @@
-// components/ProjectCard.tsx
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
+import { 
   Heading,
   Text,
   Button,
@@ -13,13 +8,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { formatCreatedAt, formatUpdatedAt } from "@/utils/formatDate";
-import api from "@/utils/api";
-import { useDispatch } from "react-redux";
-import { useToast } from "@chakra-ui/react";
-import { removeUserProject } from "@/redux/projects/projectsSlice";
-import { deleteTasksByProjectId } from "@/redux/tasks/tasksSlice";
 import Link from "next/link";
-import CustomToast from "../toast/CustomToast";
 
 // Correct type definition
 type Project = {
@@ -70,10 +59,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {
             <Heading as={'h2'} whiteSpace={'nowrap'}>Project {projectNumber}</Heading>
           </Flex>
         </Box>
-         <Flex flexDirection={'column'} gap={{base:'20px',sm:'30px',md:'50px'}} justifyContent={'space-between'}>
-         <Text textAlign={'center'} fontSize={{base:'20px',md:'22px',lg:'32px'}} fontWeight={700}>{projectTitle}</Text>
-         <Text textAlign={'center'} fontSize={{base:'20px',md:'22px',lg:'32px'}}>Created at: {formatCreatedAt(String(createdAt))}</Text>
-         </Flex>
+        <Flex flexDirection={'column'} gap={{base:'20px',sm:'30px',md:'50px'}} justifyContent={'space-between'}>
+           <Text textAlign={'center'} fontSize={{base:'20px',md:'22px',lg:'32px'}} fontWeight={700}>{projectTitle}</Text>
+           <Text textAlign={'center'} fontSize={{base:'20px',md:'22px',lg:'32px'}}>Created at: {formatCreatedAt(String(createdAt))}</Text>
+        </Flex>
       </Link>
     </Stack>
   );

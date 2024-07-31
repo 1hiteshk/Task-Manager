@@ -34,18 +34,6 @@ export const addProject = createAsyncThunk<Project, Omit<Project, '_id'>>('proje
   return response.data;
 });
 
-
-// Async thunk to fetch a single project by ID
-export const fetchProjectById = createAsyncThunk<Project, string>('projects/fetchProjectById', async (projectId) => {
-  const response = await api.get(`/projects/${projectId}`);
-  return response.data;
-});
-
-export const fetchByProjectId = async(projectId:String) => {
-  const response = await api.get(`/projects/${projectId}`);
-  return response.data;
-}
-
 // Async thunk to update an existing project
 export const updateProject = createAsyncThunk<Project, Project>('projects/updateProject', async (projectData) => {
   const response = await api.put(`/projects/${projectData._id}`, projectData);
@@ -84,14 +72,6 @@ const projectsSlice = createSlice({
       .addCase(fetchProjects.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message || 'Failed to fetch projects';
-      })
-      .addCase(fetchProjectById.fulfilled, (state, action: PayloadAction<Project>) => {
-        const index = state.projects.findIndex(p => p._id === action.payload._id);
-        if (index === -1) {
-          state.projects.push(action.payload);
-        } else {
-          state.projects[index] = action.payload;
-        }
       })
       .addCase(addProject.fulfilled, (state, action: PayloadAction<Project>) => {
         state.projects.push(action.payload);
