@@ -9,6 +9,8 @@ import {
   Button,
   Flex,
   Image,
+  Box,
+  Stack,
 } from "@chakra-ui/react";
 import { formatCreatedAt, formatUpdatedAt } from "@/utils/formatDate";
 import api from "@/utils/api";
@@ -38,9 +40,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {
   const { _id, projectNumber, projectTitle, createdAt, updatedAt } = data;
 
   return (
-    <Card
-      p={{base:6, md:10}}
-      variant={"filled"}
+    <Stack
+      p={{base:3, md:6}}
+      width={{base:'240px', md:'320px',lg:'420px'}}
+      height={{base:'240px', md:'320px',lg:''}}
+      //variant={"filled"}
       bgColor={"#8d30f4"}
       borderRadius="md"
       color="white"
@@ -48,10 +52,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {
       boxShadow="lg"
     >
       <Link href={`/projects/${_id}`}>
-        <CardHeader>
+        <Box>
           <Flex
             alignItems={"center"}
-            justifyContent={"space-between"}
+            justifyContent={"center"}
             gap={"10px"}
           >
             {" "}
@@ -63,21 +67,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ data }) => {
               mt={'20px'}
               mb={4}
             />
-            <Heading size="lg">Project {projectNumber}</Heading>
+            <Heading as={'h2'} whiteSpace={'nowrap'}>Project {projectNumber}</Heading>
           </Flex>
-        </CardHeader>
-        <CardBody>
-          <Heading size="lg" fontWeight={700}>{projectTitle}</Heading>
-        </CardBody>
-        <CardFooter display={"flex"} flexDir={"column"}>
-          <Text>Created at: {formatCreatedAt(String(createdAt))}</Text>
-         {/*  {updatedAt && <Text>Updated at: {formatUpdatedAt(updatedAt)}</Text>} */}
-        </CardFooter>
+        </Box>
+         <Flex flexDirection={'column'} gap={{base:'20px',sm:'30px',md:'50px'}} justifyContent={'space-between'}>
+         <Text textAlign={'center'} fontSize={{base:'20px',sm:'24px',lg:'32px'}} fontWeight={700}>{projectTitle}</Text>
+         <Text textAlign={'center'} fontSize={{base:'16px',sm:'20px',lg:'28px'}}>Created at: {formatCreatedAt(String(createdAt))}</Text>
+         </Flex>
       </Link>
-      {/* <Button mb={4} onClick={handleDelete}>
-        Delete Project
-      </Button> */}
-    </Card>
+    </Stack>
   );
 };
 

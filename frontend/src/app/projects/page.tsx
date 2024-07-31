@@ -113,9 +113,9 @@ const Home = () => {
     return (
       <>
         <Flex justify="center" align="center" mt={4}>
-          <Flex alignItems="center">
+          <Flex alignItems="center" minWidth={'330px'}>
             <Button onClick={handlePrev}>&lt;</Button>
-            <Box mx={4}>
+            <Box mx={{base:1,sm:3,md:4}}>
               {selectedProjectFromIndex && (
                 <ProjectCard key={selectedProjectFromIndex._id} data={selectedProjectFromIndex} />
               )}
@@ -131,7 +131,7 @@ const Home = () => {
             Edit Project
           </Button>
         </Flex>
-        <Heading as="h2" mt={8} display="flex" justifyContent="center">
+        <Heading as="h2" my={8} display="flex" justifyContent="center">
           {selectedProjectFromIndex
             ? `Tasks of ${selectedProjectFromIndex.projectTitle}`
             : 'No Tasks are there for any Project'}

@@ -1,9 +1,5 @@
 'use client'
 import { Card, CardHeader, CardBody, CardFooter, Heading, Text, Button } from '@chakra-ui/react';
-import api from '@/utils/api';
-import { useDispatch } from 'react-redux';
-import { deleteTask } from '@/redux/tasks/tasksSlice';
-import { useToast } from '@chakra-ui/react';
 import { formatDaysLeft } from '@/utils/formatDate';
 
 type Task = {
@@ -27,14 +23,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ task,projectId,onDelete,onEdit }) =
   const { _id, taskTitle, taskDescription, taskStatus, taskEndDate } = task;
 
   return (
-    <Card variant={'filled'} border={'2px solid black'}>
+    <Card variant={'filled'} border={'1px solid #1b1f2326'}>
       <CardHeader>
         <Heading size='md'>{taskTitle}</Heading>
       </CardHeader>
       <CardBody>
         <Text>Description: {taskDescription}</Text>
         <Text>Status: {taskStatus}</Text>
-        <Text>{formatDaysLeft(String(taskEndDate))}</Text>
+        <Text fontSize={{base:'18px',sm:'24px'}} fontWeight={700}>{formatDaysLeft(String(taskEndDate))}</Text>
       </CardBody>
       <CardFooter display={'flex'} flexDir={'column'}>
       <Button onClick={onEdit} mt={2} colorScheme="blue">Edit Task</Button>

@@ -5,6 +5,7 @@ import {
   Button,
   Flex,
   Heading,
+  Stack,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -56,7 +57,7 @@ const Calendar: React.FC<CalendarProps> = ({ projectId, refreshTasks }) => {
   };
 
   return (
-    <Box>
+    <Stack gap={{base:4,md:6,lg:7}}>
       <Flex justifyContent="space-between" alignItems="center" mb="4">
         <Heading size="md">{format(currentDate, "dd MMMM, yyyy")}</Heading>
         <Button colorScheme="purple" onClick={onOpen}>
@@ -75,7 +76,7 @@ const Calendar: React.FC<CalendarProps> = ({ projectId, refreshTasks }) => {
         selectedDate={selectedDate}
         refreshTasks={refreshTasks}
       />
-    </Box>
+    </Stack>
   );
 };
 
