@@ -35,3 +35,12 @@ Check out our Next.js deployment documentation for more details.
 ##Chakra UI Integration: Utilizes Chakra UI for responsive and accessible component styling. 
 ##TypeScript: Fully typed with TypeScript for better developer experience and code quality. 
 ##Testing: Unit tests using Jest and React Testing Library.
+
+# After Login or sign up
+# new users can create a project and can add task to that project and also can delete or update
+# users can delete or update projects also, if a project is deleted then it's related task will also be deleted
+# Users can click on project card to see more details and calendar specific dates.
+# By picking a date user will only be shown the tasks whose expiration date is not beyond current date of today
+# User can also filter or can sort task on the basis of task Status whether completed or not
+# There is a confirmation before deleting for better user experience
+# A toast to update the user if project or task is deleted
