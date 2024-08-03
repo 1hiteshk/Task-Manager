@@ -1,3 +1,7 @@
+- After login/signup click on a specifc project card to create Tasks specific to a project, 
+- or create a project then click on project card to create new tasks,
+- Calendar to see and sort tasks based on selected date and expiration date
+  
 First, run the development server:
 
 npm run dev
